@@ -1,0 +1,338 @@
+<div id="main" class="p-4">
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3"
+      >
+        <h4 class="card-title mb-0">Quản lý Sản phẩm</h4>
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addProductModal"
+        >
+          <i class="fas fa-plus me-2"></i>Thêm Sản phẩm
+        </button>
+      </div>
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Hình ảnh</th>
+                  <th scope="col">Tên sản phẩm</th>
+                  <th scope="col">Danh mục</th>
+                  <th scope="col">Giá</th>
+                  <th scope="col">Giảm giá (%)</th>
+                  <th scope="col">Số lượng</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>SP001</td>
+                  <td>
+                    <img
+                      src="../../public/asset/image/product01.png"
+                      alt="product image"
+                      class="rounded"
+                      style="width: 50px; height: 50px; object-fit: cover"
+                    />
+                  </td>
+                  <td>Laptop ABC</td>
+                  <td>Laptop</td>
+                  <td>$980.00</td>
+                  <td>20%</td>
+                  <td>50</td>
+                  <td><span class="badge bg-success">Còn hàng</span></td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-warning text-white me-1 edit-product-btn"
+                      title="Sửa"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editProductModal"
+                      data-id="SP001"
+                      data-name="Laptop ABC"
+                      data-price="980.00"
+                      data-category="Laptop"
+                      data-quantity="50"
+                      data-discount="20"
+                      data-status="Còn hàng"
+                      data-image="../../public/asset/image/product01.png"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger delete-product-btn"
+                      title="Xóa"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>SP002</td>
+                  <td>
+                    <img
+                      src="../../public/asset/image/product02.png"
+                      alt="product image"
+                      class="rounded"
+                      style="width: 50px; height: 50px; object-fit: cover"
+                    />
+                  </td>
+                  <td>Điện thoại XYZ</td>
+                  <td>Smartphones</td>
+                  <td>$650.00</td>
+                  <td>0%</td>
+                  <td>100</td>
+                  <td><span class="badge bg-success">Còn hàng</span></td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-warning text-white me-1 edit-product-btn"
+                      title="Sửa"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editProductModal"
+                      data-id="SP002"
+                      data-name="Điện thoại XYZ"
+                      data-price="650.00"
+                      data-category="Smartphones"
+                      data-quantity="100"
+                      data-discount="0"
+                      data-status="Còn hàng"
+                      data-image="../../public/asset/image/product02.png"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger delete-product-btn"
+                      title="Xóa"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="py-6 px-6 text-center">
+        <span class="copyright">
+          Bản quyền &copy;
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          Tất cả quyền được bảo lưu | Mẫu này được tạo bởi Hùng & Phong
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="addProductModal"
+    tabindex="-1"
+    aria-labelledby="addProductModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">Thêm Sản phẩm</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form id="addProductForm">
+            <div class="mb-3">
+              <label for="productName" class="form-label">Tên sản phẩm</label>
+              <input
+                type="text"
+                class="form-control"
+                id="productName"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="productCategory" class="form-label">Danh mục</label>
+              <input
+                type="text"
+                class="form-control"
+                id="productCategory"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="productPrice" class="form-label">Giá</label>
+              <input
+                type="number"
+                class="form-control"
+                id="productPrice"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="productDiscount" class="form-label"
+                >Giảm giá (%)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="productDiscount"
+                min="0"
+                max="100"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="productQuantity" class="form-label">Số lượng</label>
+              <input
+                type="number"
+                class="form-control"
+                id="productQuantity"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="productImage" class="form-label">Hình ảnh</label>
+              <input type="file" class="form-control" id="productImage" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Hủy
+          </button>
+          <button type="submit" form="addProductForm" class="btn btn-primary">
+            Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="editProductModal"
+    tabindex="-1"
+    aria-labelledby="editProductModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProductModalLabel">Sửa Sản phẩm</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form id="editProductForm">
+            <input type="hidden" id="editProductId" />
+            <div class="mb-3 text-center">
+              <img
+                id="editProductPreviewImage"
+                src=""
+                alt="product image preview"
+                class="rounded mb-2 d-none"
+                style="width: 50px; height: 50px; object-fit: cover"
+              />
+              <label for="editProductImage" class="form-label d-block"
+                >Hình ảnh</label
+              >
+              <input type="file" class="form-control" id="editProductImage" />
+            </div>
+            <div class="mb-3">
+              <label for="editProductName" class="form-label"
+                >Tên sản phẩm</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="editProductName"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductCategory" class="form-label"
+                >Danh mục</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="editProductCategory"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductPrice" class="form-label">Giá</label>
+              <input
+                type="number"
+                class="form-control"
+                id="editProductPrice"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductDiscount" class="form-label"
+                >Giảm giá (%)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="editProductDiscount"
+                min="0"
+                max="100"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductQuantity" class="form-label"
+                >Số lượng</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="editProductQuantity"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductStatus" class="form-label"
+                >Trạng thái</label
+              >
+              <select class="form-select" id="editProductStatus" required>
+                <option value="Còn hàng">Còn hàng</option>
+                <option value="Hết hàng">Hết hàng</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Hủy
+          </button>
+          <button type="submit" form="editProductForm" class="btn btn-primary">
+            Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

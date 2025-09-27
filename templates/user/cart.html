@@ -1,0 +1,106 @@
+<div class="container py-5">
+  <div class="d-flex justify-content-between mb-4">
+    <h2>Giỏ hàng của bạn</h2>
+  </div>
+  <p class="text-muted mb-4">
+    Trang này hiển thị các sản phẩm bạn đã thêm vào giỏ hàng
+  </p>
+  <!-- Cart Table -->
+  <div class="card shadow-sm rounded-3 mb-4">
+    <div class="card-body">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Sản phẩm</th>
+            <th scope="col">Giá</th>
+            <th scope="col">Số lượng</th>
+            <th scope="col">Tổng</th>
+            <th scope="col">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  src="../public/asset/image/product01.png"
+                  alt="Product"
+                  width="60"
+                  class="me-3 rounded"
+                />
+                <span>Giày thể thao</span>
+              </div>
+            </td>
+            <td>1.200.000 VND</td>
+            <td>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                value="1"
+                min="1"
+                style="width: 70px"
+              />
+            </td>
+            <td>1.200.000 VND</td>
+            <td>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm không?');"
+              >
+                Xóa
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  src="../public/asset/image/product02.png"
+                  alt="Product"
+                  width="60"
+                  class="me-3 rounded"
+                />
+                <span>Balo laptop</span>
+              </div>
+            </td>
+            <td>800.000 VND</td>
+            <td>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                value="2"
+                min="1"
+                style="width: 70px"
+              />
+            </td>
+            <td>1.600.000 VND</td>
+            <td>
+              <button class="btn btn-sm btn-outline-danger">Xóa</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Cart Summary -->
+  <div class="row">
+    <div class="col-md-6">
+      <a href="../public/index.php" class="btn btn-outline-secondary"
+        >Tiếp tục mua hàng</a
+      >
+    </div>
+    <div class="col-md-6 text-end">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Tóm tắt đơn hàng</h5>
+        <p><strong>Tạm tính:</strong> 2.800.000 VND</p>
+        <p><strong>Phí vận chuyển:</strong> 50.000 VND</p>
+        <hr />
+        <h5><strong>Tổng cộng:</strong> 2.850.000 VND</h5>
+        <a href="../public/checkout.php" class="btn btn-primary w-100 mt-3"
+          >Thanh toán</a
+        >
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,215 @@
+<div class="section">
+  <div class="container">
+    <div class="row">
+      <form
+        style="display: flex; gap: 20px"
+        id="checkout-form"
+        onsubmit="handleCheckout(event)"
+        method="POST"
+      >
+        <div class="col-md-7">
+          <div class="billing-details">
+            <div class="section-title">
+              <h3 class="title">Địa chỉ thanh toán</h3>
+            </div>
+            <div class="form-group mb-3">
+              <input
+                class="input"
+                type="text"
+                name="first-name"
+                placeholder="Họ"
+                required
+              />
+            </div>
+            <div class="form-group mb-3">
+              <input
+                class="input"
+                type="text"
+                name="last-name"
+                placeholder="Tên"
+                required
+              />
+            </div>
+            <div class="form-group mb-3">
+              <input
+                class="input"
+                type="email"
+                name="email"
+                placeholder="Email"
+                required
+              />
+            </div>
+            <div class="form-group mb-3">
+              <input
+                class="input"
+                type="text"
+                name="address"
+                placeholder="Địa chỉ"
+                required
+              />
+            </div>
+
+            <div class="form-group mb-3">
+              <input
+                class="input"
+                type="tel"
+                name="tel"
+                placeholder="Số điện thoại"
+                required
+              />
+            </div>
+          </div>
+          <div class="order-notes">
+            <textarea class="input" placeholder="Ghi chú đơn hàng"></textarea>
+          </div>
+        </div>
+
+        <div class="col-md-5 order-details">
+          <div class="section-title text-center">
+            <h3 class="title">Đơn hàng của bạn</h3>
+          </div>
+          <div class="order-summary">
+            <div class="order-col">
+              <div><strong>SẢN PHẨM</strong></div>
+              <div><strong>TỔNG CỘNG</strong></div>
+            </div>
+            <div class="order-products">
+              <div class="order-col">
+                <div>1x Tên sản phẩm</div>
+                <div>24.500.000 VNĐ</div>
+              </div>
+              <div class="order-col">
+                <div>2x Tên sản phẩm</div>
+                <div>24.500.000 VNĐ</div>
+              </div>
+            </div>
+            <div class="order-col">
+              <div>Phí vận chuyển</div>
+              <div><strong>MIỄN PHÍ</strong></div>
+            </div>
+            <div class="order-col">
+              <div><strong>TỔNG THANH TOÁN</strong></div>
+              <div><strong class="order-total">73.500.000 VNĐ</strong></div>
+            </div>
+          </div>
+          <div class="payment-method">
+            <div class="input-radio">
+              <input type="radio" name="payment" id="payment-1" checked />
+              <label for="payment-1">
+                <span></span>
+                Thanh toán qua **Chuyển khoản Ngân hàng**
+              </label>
+              <div class="caption">
+                <p>
+                  Bạn sẽ chuyển khoản trực tiếp vào tài khoản ngân hàng của
+                  chúng tôi.
+                </p>
+              </div>
+            </div>
+            <div class="input-radio">
+              <input type="radio" name="payment" id="payment-3" />
+              <label for="payment-3">
+                <span></span>
+                Thanh toán **Khi nhận hàng (COD)**
+              </label>
+              <div class="caption">
+                <p>Bạn có thể kiểm tra hàng hóa khi nhận hàng tại nhà.</p>
+              </div>
+            </div>
+          </div>
+          <div class="input-checkbox">
+            <input type="checkbox" id="terms" required />
+            <label for="terms">
+              <span></span>
+              Tôi đã đọc và đồng ý với <a href="#">điều khoản & điều kiện</a>
+            </label>
+          </div>
+          <button type="submit" class="primary-btn order-submit">
+            Xác nhận Đặt hàng
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="orderSuccessModal"
+  tabindex="-1"
+  aria-labelledby="orderSuccessModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="orderSuccessModalLabel">
+          <i class="fa fa-check-circle me-2"></i> Đặt hàng thành công!
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <p class="lead">
+          Cảm ơn bạn đã tin tưởng và đặt hàng tại cửa hàng chúng tôi.
+        </p>
+        <p>
+          Mã đơn hàng của bạn là: <strong id="modal-order-id">#DHXXXXX</strong>
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <a href="../public/order_history.php" class="primary-btn me-3">
+          <i class="fa fa-list me-1"></i> Xem đơn hàng
+        </a>
+        <a href="../public/index.php" class="btn btn-secondary">
+          <i class="fa fa-home me-1"></i> Trang chủ
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /**
+   * Hàm xử lý sự kiện đặt hàng (Được gọi khi form hợp lệ và được submit)
+   * @param {Event} e - Sự kiện form submit
+   */
+  function handleCheckout(e) {
+    // 1. Ngăn chặn hành vi submit form mặc định (tải lại trang)
+    e.preventDefault();
+
+    // ************************************************************
+    // BƯỚC XỬ LÝ QUAN TRỌNG: Gửi dữ liệu đơn hàng (AJAX/Fetch API)
+    // Thay thế logic giả lập này bằng AJAX POST request thực tế của bạn
+    // để gửi dữ liệu form đến file xử lý PHP/API.
+    // ************************************************************
+
+    // --- GIẢ LẬP KẾT QUẢ TỪ SERVER ---
+    const isOrderSuccessful = true; // Giả sử server trả về thành công
+
+    if (isOrderSuccessful) {
+      // Giả lập mã đơn hàng từ server. Trong thực tế, bạn sẽ lấy mã này từ phản hồi AJAX.
+      const newOrderId = "DH" + Math.floor(Math.random() * 90000 + 10000);
+
+      // 2. Cập nhật Mã Đơn hàng trong Modal
+      const modalOrderIdElement = document.getElementById("modal-order-id");
+      if (modalOrderIdElement) {
+        modalOrderIdElement.textContent = "#" + newOrderId;
+      }
+
+      // 3. Hiển thị Modal
+      // Đảm bảo thư viện Bootstrap JS đã được nhúng để sử dụng 'bootstrap.Modal'
+      const successModal = new bootstrap.Modal(
+        document.getElementById("orderSuccessModal")
+      );
+      successModal.show();
+    } else {
+      // Xử lý lỗi nếu AJAX thất bại
+      alert("Đặt hàng thất bại. Vui lòng kiểm tra lại thông tin và thử lại!");
+    }
+  }
+</script>

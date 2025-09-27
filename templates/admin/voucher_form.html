@@ -1,0 +1,263 @@
+<div id="main" class="p-4">
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3"
+      >
+        <h4 class="card-title mb-0">Quản lý Phiếu giảm giá</h4>
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addVoucherModal"
+        >
+          <i class="fas fa-plus me-2"></i>Thêm Voucher
+        </button>
+      </div>
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Mã Voucher</th>
+                  <th scope="col">Giá trị</th>
+                  <th scope="col">Số lượng</th>
+                  <th scope="col">Ngày hết hạn</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>VC001</td>
+                  <td>SUMMER20</td>
+                  <td>20%</td>
+                  <td>50</td>
+                  <td>2025-10-30</td>
+                  <td><span class="badge bg-success">Còn hiệu lực</span></td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-warning text-white me-1 edit-voucher-btn"
+                      title="Sửa"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editVoucherModal"
+                      data-id="VC001"
+                      data-code="SUMMER20"
+                      data-value="20"
+                      data-quantity="50"
+                      data-expiry="2025-10-30"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger delete-voucher-btn"
+                      title="Xóa"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>VC002</td>
+                  <td>FSHIP30K</td>
+                  <td>30.000 VNĐ</td>
+                  <td>100</td>
+                  <td>2024-12-31</td>
+                  <td><span class="badge bg-secondary">Đã hết hạn</span></td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-warning text-white me-1 edit-voucher-btn"
+                      title="Sửa"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editVoucherModal"
+                      data-id="VC002"
+                      data-code="FSHIP30K"
+                      data-value="30000"
+                      data-quantity="100"
+                      data-expiry="2024-12-31"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger delete-voucher-btn"
+                      title="Xóa"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="py-6 px-6 text-center">
+      <span class="copyright">
+        Bản quyền &copy;
+        <script>
+          document.write(new Date().getFullYear());
+        </script>
+        Tất cả quyền được bảo lưu | Mẫu này được tạo bởi Hùng & Phong
+      </span>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="addVoucherModal"
+    tabindex="-1"
+    aria-labelledby="addVoucherModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addVoucherModalLabel">Thêm Voucher</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form id="addVoucherForm">
+            <div class="mb-3">
+              <label for="voucherCode" class="form-label">Mã Voucher</label>
+              <input
+                type="text"
+                class="form-control"
+                id="voucherCode"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="voucherValue" class="form-label"
+                >Giá trị giảm giá (%)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="voucherValue"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="voucherQuantity" class="form-label">Số lượng</label>
+              <input
+                type="number"
+                class="form-control"
+                id="voucherQuantity"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="voucherExpiry" class="form-label">Ngày hết hạn</label>
+              <input
+                type="date"
+                class="form-control"
+                id="voucherExpiry"
+                required
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Hủy
+          </button>
+          <button type="submit" form="addVoucherForm" class="btn btn-primary">
+            Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="editVoucherModal"
+    tabindex="-1"
+    aria-labelledby="editVoucherModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editVoucherModalLabel">Sửa Voucher</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form id="editVoucherForm">
+            <input type="hidden" id="editVoucherId" />
+            <div class="mb-3">
+              <label for="editVoucherCode" class="form-label">Mã Voucher</label>
+              <input
+                type="text"
+                class="form-control"
+                id="editVoucherCode"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editVoucherValue" class="form-label"
+                >Giá trị giảm giá (%)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="editVoucherValue"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editVoucherQuantity" class="form-label"
+                >Số lượng</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="editVoucherQuantity"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editVoucherExpiry" class="form-label"
+                >Ngày hết hạn</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                id="editVoucherExpiry"
+                required
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Hủy
+          </button>
+          <button type="submit" form="editVoucherForm" class="btn btn-primary">
+            Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
