@@ -1,0 +1,26 @@
+/* File: public/css/style.css */
+/* Nơi để viết các CSS tùy chỉnh của bạn */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+}
+
+.product-card {
+    transition: transform .2s; /* Hiệu ứng phóng to khi hover */
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,.2);
+}
+
+.product-card img {
+    height: 200px;
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+}

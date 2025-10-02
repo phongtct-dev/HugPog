@@ -1,26 +1,8 @@
 <?php
-session_start();
+// File: project/public/logout.php
 
-// Hủy tất cả các biến session
-$_SESSION = array();
+require_once '../includes/controllers/UserController.php';
 
-// Nếu session được sử dụng với cookie, hủy cookie session
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(
-        session_name(),
-        '',
-        time() - 42000,
-        $params["path"],
-        $params["domain"],
-        $params["secure"],
-        $params["httponly"]
-    );
-}
-
-// Hủy session
-session_destroy();
-
-// Chuyển hướng về trang đăng nhập
-header("Location: login.php");
-exit();
+$userController = new UserController();
+$userController->handleLogout();
+?>
