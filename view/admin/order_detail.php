@@ -37,30 +37,29 @@
         <div class="card">
             <div class="card-header">Xử lý đơn hàng</div>
             <div class="card-body">
-                <p>Trạng thái hiện tại: <strong class="text-primary"><?php echo htmlspecialchars(ucfirst($order['status'])); ?></strong></p>
+                <p>Trạng thái hiện tại: <strong class="text-primary"><?php echo htmlspecialchars($order['status']); ?></strong></p>
                 <hr>
                 <div class="d-grid gap-2">
                     <?php 
-                    // Chỉ hiển thị nút nếu đơn hàng chưa hoàn thành hoặc chưa hủy
-                    if ($order['status'] !== 'completed' && $order['status'] !== 'cancelled'): 
+                    if ($order['status'] !== 'Thành công' && $order['status'] !== 'Đã hủy'): 
                     ?>
                         <form action="process_order.php" method="POST" class="d-grid">
                             <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
                             <input type="hidden" name="action" value="progress">
                             <button type="submit" class="btn btn-success">
                                 <?php
-                                // Hiển thị text của nút dựa trên trạng thái hiện tại
+                                // Hiển thị text của nút dựa trên trạng thái tiếng Việt
                                 switch ($order['status']) {
-                                    case 'pending': echo 'Xác nhận đơn hàng'; break;
-                                    case 'confirmed': echo 'Bắt đầu giao hàng'; break;
-                                    case 'shipping': echo 'Đã giao thành công'; break;
-                                    case 'delivered': echo 'Hoàn thành đơn hàng'; break;
+                                    case 'Chờ Xác nhận': echo 'Xác nhận Đơn hàng'; break;
+                                    case 'Đã Xác nhận': echo 'Bắt đầu Giao hàng'; break;
+                                    case 'Đang giao': echo 'Đã Giao hàng'; break;
+                                    case 'Đã giao': echo 'Hoàn thành Đơn hàng'; break;
                                 }
                                 ?>
                             </button>
                         </form>
                         
-                        <?php if ($order['status'] === 'pending' || $order['status'] === 'confirmed'): ?>
+                        <?php if ($order['status'] === 'Chờ Xác nhận' || $order['status'] === 'Đã Xác nhận'): ?>
                         <form action="process_order.php" method="POST" class="d-grid">
                             <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
                             <input type="hidden" name="action" value="cancel">

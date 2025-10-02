@@ -36,7 +36,7 @@
                     <h6>Trạng thái</h6>
                     <h4><span class="badge bg-success"><?php echo ucfirst($order['status']); ?></span></h4>
 
-                    <?php if($order['status'] === 'pending'): ?>
+                    <?php if($order['status'] === 'Chờ Xác nhận'): ?>
                     <form action="cancel_order.php" method="POST" class="mt-3">
                         <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">Hủy đơn hàng</button>

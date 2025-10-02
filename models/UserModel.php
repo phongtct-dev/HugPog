@@ -105,5 +105,51 @@ class UserModel {
         $conn->close();
         return $success;
     }
+
+    //
+
+        /**
+     * Cập nhật tổng chi tiêu và hạng của người dùng sau khi một đơn hàng hoàn thành.
+     * @param int $userId ID của người dùng.
+     * @param float $orderTotal Giá trị đơn hàng vừa hoàn thành.
+     */
+    public function updateUserSpendingAndRank($userId, $orderTotal) {
+        $conn = db_connect();
+
+        // 1. Cộng dồn tổng chi tiêu cho người dùng
+        $sqlUpdateSpending = "UPDATE users SET total_spent = total_spent + ? WHERE id = ?";
+        $stmt = $conn->prepare($sqlUpdateSpending);
+        $stmt->bind_param("di", $orderTotal, $userId);
+        $stmt->execute();
+        $stmt->close();
+
+        // 2. Lấy lại tổng chi tiêu mới nhất
+        $sqlSelectSpending = "SELECT total_spent FROM users WHERE id = ?";
+        $stmt = $conn->prepare($sqlSelectSpending);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $totalSpent = $user['total_spent'];
+        $stmt->close();
+
+        // 3. Xác định hạng mới dựa trên tổng chi tiêu
+        // Bạn có thể thay đổi các mốc này tùy theo chính sách của cửa hàng
+        $newRank = 'silver';
+        if ($totalSpent >= 10000000) { // Mốc 10 triệu cho hạng Kim cương
+            $newRank = 'diamond';
+        } elseif ($totalSpent >= 5000000) { // Mốc 5 triệu cho hạng Vàng
+            $newRank = 'gold';
+        }
+
+        // 4. Cập nhật lại hạng mới cho người dùng
+        $sqlUpdateRank = "UPDATE users SET `rank` = ? WHERE id = ?";
+        $stmt = $conn->prepare($sqlUpdateRank);
+        $stmt->bind_param("si", $newRank, $userId);
+        $stmt->execute();
+        $stmt->close();
+
+        $conn->close();
+    }
 }
 ?>

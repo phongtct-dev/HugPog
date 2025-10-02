@@ -257,19 +257,18 @@ class OrderModel {
      * @param int $userId
      * @return bool
      */
-    public function cancelOrder($orderId, $userId) {
-        $conn = db_connect();
-        // Chỉ cho phép hủy khi trạng thái là 'pending' và của đúng user
-        $sql = "UPDATE orders SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'pending'";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $orderId, $userId);
-        $stmt->execute();
-        // Lấy số dòng bị ảnh hưởng, nếu > 0 tức là hủy thành công
-        $affected_rows = $stmt->affected_rows;
-        $stmt->close();
-        $conn->close();
-        return $affected_rows > 0;
-    }
+            public function cancelOrder($orderId, $userId) {
+            $conn = db_connect();
+            // Chỉ cho phép hủy khi trạng thái là 'Chờ Xác nhận'
+            $sql = "UPDATE orders SET status = 'Đã hủy' WHERE id = ? AND user_id = ? AND status = 'Chờ Xác nhận'";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ii", $orderId, $userId);
+            $stmt->execute();
+            $affected_rows = $stmt->affected_rows;
+            $stmt->close();
+            $conn->close();
+            return $affected_rows > 0;
+        }
 
     //
 

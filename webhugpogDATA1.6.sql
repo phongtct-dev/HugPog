@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 02, 2025 lúc 08:36 PM
+-- Thời gian đã tạo: Th10 02, 2025 lúc 11:14 PM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.2.4
 
@@ -78,7 +78,7 @@ CREATE TABLE `orders` (
   `voucher_code` varchar(50) DEFAULT NULL,
   `discount_amount` decimal(15,2) DEFAULT 0.00,
   `total_amount` decimal(15,2) NOT NULL,
-  `status` enum('pending','confirmed','shipping','delivered','completed','cancelled') DEFAULT 'pending',
+  `status` enum('Chờ Xác nhận','Đã Xác nhận','Đang giao','Đã giao','Thành công','Đã hủy') NOT NULL DEFAULT 'Chờ Xác nhận',
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -88,15 +88,16 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `customer_name`, `shipping_address`, `phone`, `voucher_id`, `voucher_code`, `discount_amount`, `total_amount`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Nguyễn Văn An', '123 Đường A, Quận 1, TP.HCM', '0901112221', NULL, NULL, 0.00, 1040000.00, 'completed', '2025-02-03 01:10:54', '2025-10-03 01:10:54'),
-(2, 2, 'Trần Văn Bình', '456 Đường B, Quận 3, TP.HCM', '0901112222', NULL, NULL, 0.00, 6990000.00, 'completed', '2025-03-03 01:10:54', '2025-10-03 01:10:54'),
-(3, 3, 'Lê Thị Cường', '789 Đường C, Quận 5, TP.HCM', '0901112223', NULL, NULL, 0.00, 4780000.00, 'completed', '2025-04-03 01:10:54', '2025-10-03 01:10:54'),
-(4, 4, 'Phạm Văn Dũng', '101 Đường D, TP. Thủ Đức', '0901112224', NULL, NULL, 0.00, 550000.00, 'cancelled', '2025-05-03 01:10:54', '2025-10-03 01:10:54'),
-(5, 5, 'Hoàng Thị E', '212 Đường E, Quận 10, TP.HCM', '0901112225', NULL, NULL, 0.00, 5080000.00, 'shipping', '2025-06-03 01:10:54', '2025-10-03 01:10:54'),
-(6, 2, 'Bình Trần', '456 Đường B, Quận 3, TP.HCM', '0901112222', NULL, NULL, 0.00, 750000.00, 'delivered', '2025-07-03 01:10:54', '2025-10-03 01:10:54'),
-(7, 1, 'An Nguyễn', '123 Đường A, Quận 1, TP.HCM', '0901112221', NULL, NULL, 0.00, 2490000.00, 'confirmed', '2025-08-03 01:10:54', '2025-10-03 01:10:54'),
-(8, 7, 'Đỗ Thị H', '333 Đường H, Quận Gò Vấp', '0901112227', NULL, NULL, 0.00, 350000.00, 'pending', '2025-09-03 01:10:54', '2025-10-03 01:10:54'),
-(9, 8, 'Ngô Thị K', '444 Đường K, Quận Bình Thạnh', '0901112228', NULL, NULL, 0.00, 890000.00, 'pending', '2025-10-03 01:10:54', '2025-10-03 01:10:54');
+(1, 1, 'Nguyễn Văn An', '123 Đường A, Quận 1, TP.HCM', '0901112221', NULL, NULL, 0.00, 1040000.00, 'Thành công', '2025-02-03 01:10:54', '2025-10-03 04:01:02'),
+(2, 2, 'Trần Văn Bình', '456 Đường B, Quận 3, TP.HCM', '0901112222', NULL, NULL, 0.00, 6990000.00, 'Thành công', '2025-03-03 01:10:54', '2025-10-03 04:01:02'),
+(3, 3, 'Lê Thị Cường', '789 Đường C, Quận 5, TP.HCM', '0901112223', NULL, NULL, 0.00, 4780000.00, 'Thành công', '2025-04-03 01:10:54', '2025-10-03 04:01:02'),
+(4, 4, 'Phạm Văn Dũng', '101 Đường D, TP. Thủ Đức', '0901112224', NULL, NULL, 0.00, 550000.00, 'Thành công', '2025-05-03 01:10:54', '2025-10-03 04:01:02'),
+(5, 5, 'Hoàng Thị E', '212 Đường E, Quận 10, TP.HCM', '0901112225', NULL, NULL, 0.00, 5080000.00, 'Thành công', '2025-06-03 01:10:54', '2025-10-03 04:01:02'),
+(6, 2, 'Bình Trần', '456 Đường B, Quận 3, TP.HCM', '0901112222', NULL, NULL, 0.00, 750000.00, 'Thành công', '2025-07-03 01:10:54', '2025-10-03 04:01:02'),
+(7, 1, 'An Nguyễn', '123 Đường A, Quận 1, TP.HCM', '0901112221', NULL, NULL, 0.00, 2490000.00, 'Thành công', '2025-08-03 01:10:54', '2025-10-03 04:01:02'),
+(8, 7, 'Đỗ Thị H', '333 Đường H, Quận Gò Vấp', '0901112227', NULL, NULL, 0.00, 350000.00, 'Thành công', '2025-09-03 01:10:54', '2025-10-03 04:01:02'),
+(9, 8, 'Ngô Thị K', '444 Đường K, Quận Bình Thạnh', '0901112228', NULL, NULL, 0.00, 890000.00, 'Thành công', '2025-10-03 01:10:54', '2025-10-03 04:01:02'),
+(10, 10, 'a', 'Thành Phố Hồ Chí Minh', '0384222348', NULL, NULL, 0.00, 6990000.00, 'Thành công', '2025-10-03 04:10:53', '2025-10-03 04:11:32');
 
 -- --------------------------------------------------------
 
@@ -128,7 +129,8 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`) 
 (9, 6, 7, 1, 750000.00),
 (10, 7, 8, 1, 2490000.00),
 (11, 8, 2, 1, 350000.00),
-(12, 9, 3, 1, 890000.00);
+(12, 9, 3, 1, 890000.00),
+(13, 10, 1, 1, 6990000.00);
 
 -- --------------------------------------------------------
 
@@ -277,7 +279,8 @@ INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `full_name`, `p
 (6, 'vovang', 'vovang@email.com', '$2y$10$DnqUFgr4Hu3vftnkSqteQuTRyP/YWk768XgYmwh5ekPUdayPof9Iy', 'Võ Văn G', '0901112226', NULL, '', 0.00, 'locked', '2025-06-03 01:10:54'),
 (7, 'dothih', 'dothih@email.com', '$2y$10$DnqUFgr4Hu3vftnkSqteQuTRyP/YWk768XgYmwh5ekPUdayPof9Iy', 'Đỗ Thị H', '0901112227', NULL, 'silver', 250000.00, 'active', '2025-07-03 01:10:54'),
 (8, 'ngothik', 'ngothik@email.com', '$2y$10$DnqUFgr4Hu3vftnkSqteQuTRyP/YWk768XgYmwh5ekPUdayPof9Iy', 'Ngô Thị K', '0901112228', NULL, 'silver', 0.00, 'active', '2025-08-03 01:10:54'),
-(9, 'trinhvanl', 'trinhvanl@email.com', '$2y$10$DnqUFgr4Hu3vftnkSqteQuTRyP/YWk768XgYmwh5ekPUdayPof9Iy', 'Trịnh Văn L', '0901112229', NULL, 'silver', 990000.00, 'active', '2025-09-03 01:10:54');
+(9, 'trinhvanl', 'trinhvanl@email.com', '$2y$10$DnqUFgr4Hu3vftnkSqteQuTRyP/YWk768XgYmwh5ekPUdayPof9Iy', 'Trịnh Văn L', '0901112229', NULL, 'silver', 990000.00, 'active', '2025-09-03 01:10:54'),
+(10, 'Văn A', 'a@gmail.com', '$2y$10$kogPFHCN26yrj3YS3D7TDOCgbIc6kaDhYvDMCpiRuQ07N7lnp3rq2', 'tranphong', NULL, NULL, 'gold', 6990000.00, 'active', '2025-10-03 04:09:49');
 
 -- --------------------------------------------------------
 
@@ -394,7 +397,7 @@ ALTER TABLE `vouchers`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -406,13 +409,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT cho bảng `products`
@@ -442,7 +445,7 @@ ALTER TABLE `staff_accounts`
 -- AUTO_INCREMENT cho bảng `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT cho bảng `vouchers`

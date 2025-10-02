@@ -79,55 +79,51 @@ class OrderController {
         return null;
     }
 
-    /**
-     * Xử lý việc cập nhật trạng thái đơn hàng theo quy trình (tiến trình hoặc hủy).
-     */
-    public function handleProcessOrder() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'], $_POST['action'])) {
-            $orderId = intval($_POST['order_id']);
-            $action = $_POST['action'];
-            
-            $orderModel = new OrderModel();
-            $order = $orderModel->getOrderDetailsById($orderId);
+            /**
+             * Xử lý việc cập nhật trạng thái đơn hàng theo quy trình (tiến trình hoặc hủy).
+             */
+            public function handleProcessOrder() {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'], $_POST['action'])) {
+                $orderId = intval($_POST['order_id']);
+                $action = $_POST['action'];
 
-            if (!$order) {
-                // Không tìm thấy đơn hàng, không làm gì cả
-                header('Location: ' . BASE_URL . 'public/admin/orders.php');
-                exit();
-            }
+                $orderModel = new OrderModel();
+                $order = $orderModel->getOrderDetailsById($orderId);
 
-            $newStatus = $order['status']; // Mặc định là trạng thái cũ
+                if (!$order) {
+                    header('Location: ' . BASE_URL . 'public/admin/orders.php');
+                    exit();
+                }
 
-            if ($action === 'cancel') {
-                $newStatus = 'cancelled';
-            } elseif ($action === 'progress') {
-                // Xác định trạng thái tiếp theo dựa trên trạng thái hiện tại
-                switch ($order['status']) {
-                    case 'pending':
-                        $newStatus = 'confirmed';
-                        break;
-                    case 'confirmed':
-                        $newStatus = 'shipping';
-                        break;
-                    case 'shipping':
-                        $newStatus = 'delivered';
-                        break;
-                    case 'delivered':
-                        $newStatus = 'completed';
-                        break;
-                    // Nếu là 'completed' hoặc 'cancelled' thì không làm gì cả
+                $newStatus = $order['status'];
+
+                if ($action === 'cancel') {
+                    $newStatus = 'Đã hủy';
+                } elseif ($action === 'progress') {
+                    switch ($order['status']) {
+                        case 'Chờ Xác nhận': $newStatus = 'Đã Xác nhận'; break;
+                        case 'Đã Xác nhận': $newStatus = 'Đang giao'; break;
+                        case 'Đang giao': $newStatus = 'Đã giao'; break;
+                        case 'Đã giao': $newStatus = 'Thành công'; break;
+                    }
+                }
+
+                if ($newStatus !== $order['status']) {
+                    $orderModel->updateOrderStatus($orderId, $newStatus);
+
+                    // === TÍCH HỢP LOGIC CẬP NHẬT HẠNG KHÁCH HÀNG Ở ĐÂY ===
+                    if ($newStatus === 'Thành công') {
+                        // Cần nạp UserModel để sử dụng
+                        require_once __DIR__ . '/../../models/UserModel.php';
+                        $userModel = new UserModel();
+                        $userModel->updateUserSpendingAndRank($order['user_id'], $order['total_amount']);
+                    }
+                    // =======================================================
                 }
             }
-            
-            // Chỉ cập nhật nếu trạng thái có thay đổi
-            if ($newStatus !== $order['status']) {
-                $orderModel->updateOrderStatus($orderId, $newStatus);
-            }
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit();
         }
-        // Luôn chuyển hướng về lại trang chi tiết đơn hàng
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
-        exit();
-    }
 
     //
 
