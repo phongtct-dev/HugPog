@@ -1,73 +1,129 @@
-<?php
-// File: project/View/user/checkout.php
+<!doctype html>
+<html lang="vi">
 
-include __DIR__ . '/../header.php';
-?>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/HugPog/public/css/style.css">
+    <link rel="stylesheet" href="/HugPog/public/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+</head>
 
-<div class="container">
-    <h1 class="my-4">Thanh toán</h1>
-    <div class="row">
-        <div class="col-md-8">
-            <h4>Thông tin giao hàng</h4>
-            <div class="card">
-                <div class="card-body">
-                    <form action="<?php echo BASE_URL; ?>public/place_order.php" method="POST">
-                        <div class="mb-3">
-                            <label for="full_name" class="form-label">Họ và tên người nhận</label>
-                            <input type="text" class="form-control" id="full_name" name="full_name" required>
+<body>
+    <?php include __DIR__ . '/../layout/header.php'; ?>
+
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <form id="checkout-form" action="<?= BASE_URL; ?>public/place_order.php" method="POST">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="billing-details">
+                                <div class="section-title">
+                                    <h3 class="title">Địa chỉ thanh toán</h3>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <input class="input" type="text" name="full_name" placeholder="Họ và tên"
+                                        value="<?= htmlspecialchars($currentUser['fullname'] ?? '') ?>" required />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <input class="input" type="email" name="email" placeholder="Email"
+                                        value="<?= htmlspecialchars($currentUser['email'] ?? '') ?>" readonly />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <input class="input" type="text" name="address" placeholder="Địa chỉ giao hàng"
+                                        value="<?= htmlspecialchars($currentUser['address'] ?? '') ?>" required />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <input class="input" type="tel" name="phone" placeholder="Số điện thoại"
+                                        value="<?= htmlspecialchars($currentUser['phone'] ?? '') ?>" required />
+                                </div>
+
+                                <div class="order-notes mt-4">
+                                    <textarea class="input" placeholder="Ghi chú đơn hàng (Tùy chọn)" name="order_notes"></textarea>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Địa chỉ giao hàng</label>
-                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+
+                        <div class="col-md-5">
+                            <div class="order-details">
+                                <div class="section-title text-center">
+                                    <h3 class="title">ĐƠN HÀNG CỦA BẠN</h3>
+                                </div>
+
+                                <div class="order-summary">
+                                    <div class="order-col">
+                                        <div><strong>SẢN PHẨM</strong></div>
+                                        <div><strong>TỔNG CỘNG</strong></div>
+                                    </div>
+
+                                    <?php foreach ($cartItems as $item): ?>
+                                        <?php $itemTotal = ($item['discounted_price'] ?? $item['price']) * $item['quantity']; ?>
+                                        <div class="order-products">
+                                            <div class="order-col">
+                                                <div><?= htmlspecialchars($item['quantity']) ?>x <?= htmlspecialchars($item['name']) ?></div>
+                                                <div><?= format_currency($itemTotal) ?></div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+
+                                    <span>------------------------------------------------------------</span>
+
+                                    <div class="order-col">
+                                        <div>Tạm tính:</div>
+                                        <div><?= formatPrice($subtotal) ?></div>
+                                    </div>
+                                    <div class="order-col">
+                                        <div>Giảm giá (Voucher)</div>
+                                        <div><strong>-<?= formatPrice($voucherDiscount) ?></strong></div>
+                                    </div>
+                                </div>
+
+                                <div class="order-col">
+                                    <div><strong>TỔNG CỘNG</strong></div>
+                                    <div><strong class="order-total"><?= formatPrice($totalAmount) ?></strong></div>
+                                </div>
+
+                                <div class="payment-method">
+                                    <div class="input-radio">
+                                        <input type="radio" name="payment" id="payment-1" value="cod" checked>
+                                        <label for="payment-1">
+                                            <span></span>
+                                            Thanh toán khi nhận hàng (COD)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="input-checkbox">
+                                    <input type="checkbox" id="terms" required>
+                                    <label for="terms">
+                                        <span></span>
+                                        Tôi đã đọc và chấp nhận <a href="#">Các Điều khoản & Điều kiện</a>
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="primary-btn order-submit">ĐẶT HÀNG</button>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Số điện thoại</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Xác nhận và Đặt hàng</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <h4>Đơn hàng của bạn</h4>
-            <div class="card">
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <?php 
-                        $subtotal = 0;
-                        $discount = $_SESSION['voucher']['discount_value'] ?? 0;
-                        ?>
-                        <?php foreach ($cartItems as $item): 
-                            $item_total = $item['price'] * $item['quantity'];
-                            $subtotal += $item_total;
-                        ?>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span><?php echo htmlspecialchars($item['name']); ?> (x<?php echo $item['quantity']; ?>)</span>
-                                <span><?php echo number_format($item_total, 0, ',', '.'); ?></span>
-                            </li>
-                        <?php endforeach; ?>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Tạm tính</span>
-                            <span><?php echo number_format($subtotal, 0, ',', '.'); ?></span>
-                        </li>
-                        <?php if ($discount > 0): ?>
-                        <li class="list-group-item d-flex justify-content-between text-success">
-                            <span>Giảm giá</span>
-                            <span>-<?php echo number_format($discount, 0, ',', '.'); ?></span>
-                        </li>
-                        <?php endif; ?>
-                         <li class="list-group-item d-flex justify-content-between fw-bold fs-5">
-                            <span>Thành tiền</span>
-                            <span class="text-danger"><?php echo number_format($subtotal - $discount, 0, ',', '.'); ?> VNĐ</span>
-                        </li>
-                    </ul>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
+    <?php include __DIR__ . '/../layout/footer.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+    <script src="/HugPog/public/js/main.js"></script>
+</body>
 
-<?php
-include __DIR__ . '/../footer.php';
-?>
+</html>

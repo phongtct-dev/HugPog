@@ -1,26 +1,23 @@
 <?php
-// File: project/public/index.php (Phiên bản Tìm kiếm Nâng cao)
-
 require_once '../includes/controllers/ProductController.php';
-require_once '../includes/controllers/CategoryController.php';
+require_once '../models/OrderModel.php';     
 
 $productController = new ProductController();
-$categoryController = new CategoryController();
+$order_model = new OrderModel();
 
-// 1. Luôn lấy danh sách danh mục và thương hiệu để hiển thị form bộ lọc
-$categories = $categoryController->listCategories();
-$brands = $productController->productModel->getDistinctBrands();
 
-// 2. Lấy các giá trị lọc từ URL mà người dùng gửi lên (qua method GET)
-$filters = [
-    'categories' => $_GET['categories'] ?? [], // Lấy mảng các danh mục
-    'max_price'  => $_GET['max_price'] ?? null,   // Lấy giá tối đa
-    'brands'     => $_GET['brands'] ?? []      // Lấy mảng các thương hiệu
-];
+// 3. Lấy dữ liệu cần thiết cho trang chủ
+// Giả định hàm này lấy tất cả sản phẩm đang hoạt động, đã được tính toán giá giảm
+// (như được định nghĩa trong ProductController và ProductModel).
+$allProduct = $productController->getProductsForHomePage();
 
-// 3. Gọi hàm filterProducts trong Model để lấy sản phẩm theo đúng bộ lọc
-$products = $productController->productModel->filterProducts($filters);
+// 5. Logic phân chia sản phẩm (để hiển thị theo cột trong giao diện)
+// Giả định muốn hiển thị tối đa 16 sản phẩm (4 hàng x 4 cột)
+$bestSellers = array_slice($allProduct, 0, 4);
+// Số sản phẩm muốn hiển thị trong mỗi cột của khối "Sản phẩm bán chạy"
+$productsPerBlock = ceil(count($bestSellers) / 4);
+$productBlocks = array_chunk($bestSellers, 1);
+$top_products = $order_model->getTopSellingProducts(4) ?? [];
 
-// 4. Nạp file giao diện và truyền tất cả dữ liệu cần thiết qua
-include '../View/user/product_list.php';
+include '../view/user/index.php';
 ?>

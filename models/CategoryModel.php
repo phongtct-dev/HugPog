@@ -35,7 +35,6 @@ class CategoryModel {
         $stmt->bind_param("ssi", $name, $description, $id);
         return $stmt->execute();
     }
-
     public function deleteCategory($id) {
         $conn = db_connect();
         $sql = "DELETE FROM categories WHERE id = ?";

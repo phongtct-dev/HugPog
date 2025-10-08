@@ -8,5 +8,5 @@ $searchData = $controller->handleSearch();
 $products = $searchData['products'];
 $keyword = $searchData['keyword'];
 
-include '../View/user/search_results.php';
+include '../view/user/search_results.php';
 ?>

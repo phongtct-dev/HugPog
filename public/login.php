@@ -11,5 +11,5 @@ $userController = new UserController();
 $errors = $userController->handleLogin();
 
 // 4. Nhúng View để hiển thị form
-include '../View/user/login.php';
+include '../view/user/login.php';
 ?>

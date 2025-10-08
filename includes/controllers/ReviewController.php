@@ -68,5 +68,54 @@ class ReviewController {
         header('Location: ' . $_SERVER['HTTP_REFERER']);
         exit();
     }
+
+    /**
+     * Xử lý các hành động quản trị (Visible, Hidden) trên đánh giá.
+     * Phương thức này sẽ xử lý POST và tự động chuyển hướng.
+     */
+    public function handleAdminReviewAction() {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+            $action_type = $_POST['action_type'] ?? '';
+            $review_id = $_POST['reviewId'] ?? null;
+            $redirect_url = 'reviews.php';
+
+            if (!empty($review_id)) {
+                $result = false;
+                $message_content = 'Thao tác không xác định.';
+                $reviewModel = new ReviewModel();
+
+                try {
+                    switch ($action_type) {
+                        case 'visible':
+                            $result = $reviewModel->updateReviewStatus($review_id, 'visible');
+                            $message_content = $result ? '✅ Duyệt (Hiển thị) đánh giá thành công!' : '❌ Lỗi: Duyệt đánh giá thất bại.';
+                            break;
+                        case 'hidden': 
+                            $result = $reviewModel->updateReviewStatus($review_id, 'hidden');
+                            $message_content = $result ? '✅ Ẩn đánh giá thành công!' : '❌ Lỗi: Ẩn đánh giá thất bại.';
+                            break;
+                        default:
+                            $message_content = 'Thao tác không hợp lệ.';
+                            $message_type = 'error';
+                    }
+
+                    if (!isset($message_type)) {
+                        $message_type = $result ? 'success' : 'error';
+                    }
+                } catch (Exception $e) {
+                    $message_content = '❌ Lỗi hệ thống: ' . $e->getMessage();
+                    $message_type = 'error';
+                }
+
+                // Lưu kết quả vào Session và REDIRECT (PRG Pattern)
+                $_SESSION['message'] = ['type' => $message_type, 'content' => $message_content];
+                header("Location: " . $redirect_url);
+                exit();
+            }
+        }
+    }
 }
 ?>

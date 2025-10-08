@@ -3,7 +3,8 @@
 
 require_once __DIR__ . '/../includes/db_connect.php';
 
-class CartModel {
+class CartModel
+{
 
     /**
      * Thêm sản phẩm vào giỏ hàng hoặc cập nhật số lượng nếu đã tồn tại.
@@ -13,14 +14,15 @@ class CartModel {
      * @param int $quantity Số lượng cần thêm.
      * @return bool True nếu thành công, false nếu thất bại.
      */
-    public function upsertItem($userId, $productId, $quantity) {
+    public function upsertItem($userId, $productId, $quantity)
+    {
         $conn = db_connect();
         $sql = "INSERT INTO carts (user_id, product_id, quantity) VALUES (?, ?, ?)
                 ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
-        
+
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iii", $userId, $productId, $quantity);
-        
+
         if ($stmt->execute()) {
             $stmt->close();
             $conn->close();
@@ -36,7 +38,8 @@ class CartModel {
      * @param int $userId ID người dùng.
      * @return int Tổng số lượng.
      */
-    public function getCartItemCount($userId) {
+    public function getCartItemCount($userId)
+    {
         $conn = db_connect();
         $sql = "SELECT SUM(quantity) as total_items FROM carts WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
@@ -46,7 +49,7 @@ class CartModel {
         $row = $result->fetch_assoc();
         $stmt->close();
         $conn->close();
-        
+
         // Nếu không có sản phẩm nào, $row['total_items'] sẽ là NULL, nên ta trả về 0
         return $row['total_items'] ?? 0;
     }
@@ -58,10 +61,11 @@ class CartModel {
      * @param int $userId ID người dùng.
      * @return array Mảng chứa các sản phẩm trong giỏ hàng.
      */
-    public function getCartItemsByUserId($userId) {
-    $conn = db_connect();
-    // THÊM LEFT JOIN VÀO BẢNG KHUYẾN MÃI
-    $sql = "SELECT 
+    public function getCartItemsByUserId($userId)
+    {
+        $conn = db_connect();
+        // THÊM LEFT JOIN VÀO BẢNG KHUYẾN MÃI
+        $sql = "SELECT 
                 p.id, p.name, p.price, p.image_url, p.stock, 
                 c.quantity,
                 pd.discount_percent,
@@ -71,15 +75,15 @@ class CartModel {
             LEFT JOIN product_discounts pd ON p.id = pd.product_id AND CURDATE() BETWEEN pd.start_date AND pd.end_date
             WHERE c.user_id = ?";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $items = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $items = $result->fetch_all(MYSQLI_ASSOC);
 
-    $stmt->close();
-    $conn->close();
-    return $items;
+        $stmt->close();
+        $conn->close();
+        return $items;
     }
 
     /**
@@ -89,7 +93,8 @@ class CartModel {
      * @param int $quantity Số lượng mới.
      * @return bool True nếu thành công.
      */
-    public function updateItemQuantity($userId, $productId, $quantity) {
+    public function updateItemQuantity($userId, $productId, $quantity)
+    {
         $conn = db_connect();
         $sql = "UPDATE carts SET quantity = ? WHERE user_id = ? AND product_id = ?";
         $stmt = $conn->prepare($sql);
@@ -106,7 +111,8 @@ class CartModel {
      * @param int $productId ID sản phẩm.
      * @return bool True nếu thành công.
      */
-    public function removeItem($userId, $productId) {
+    public function removeItem($userId, $productId)
+    {
         $conn = db_connect();
         $sql = "DELETE FROM carts WHERE user_id = ? AND product_id = ?";
         $stmt = $conn->prepare($sql);
@@ -116,5 +122,23 @@ class CartModel {
         $conn->close();
         return $success;
     }
+
+    /**
+     * Lấy tổng số lượng sản phẩm trong giỏ hàng của người dùng.
+     * @param int $userId ID người dùng.
+     * @return int Tổng số lượng.
+     */
+    public function getTotalQuantity($userId)
+    {
+        $conn = db_connect();
+        $sql = "SELECT SUM(quantity) as total_qty FROM carts WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        $conn->close();
+        return (int)($row['total_qty'] ?? 0);
+    }
 }
-?>

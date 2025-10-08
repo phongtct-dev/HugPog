@@ -1,16 +1,39 @@
 <?php
-// File: project/public/register.php
+// File: register.php
 
-// 1. Nhúng Controller vào
-require_once '../includes/controllers/UserController.php';
+// Khởi động session để lưu thông báo thành công (nếu có)
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-// 2. Tạo đối tượng từ Controller
+require_once __DIR__ . '../../includes/controllers/UserController.php';
+
+// Khởi tạo Controller
 $userController = new UserController();
 
-// 3. Gọi hàm xử lý logic đăng ký và nhận về mảng lỗi
+// Gọi hàm xử lý đăng ký, hàm này sẽ trả về mảng lỗi (trống nếu thành công hoặc POST chưa được gửi)
 $errors = $userController->handleRegister();
 
-// 4. Nhúng file View (giao diện) vào để hiển thị
-// Biến $errors sẽ được sử dụng bên trong file view này
+// Xử lý thông báo
+$error_message = '';
+$success_message = '';
+
+// Nếu có lỗi, nối các lỗi lại thành một chuỗi để hiển thị
+if (!empty($errors)) {
+    $error_message = implode("<br>", $errors);
+}
+
+// Lấy thông báo thành công từ SESSION (nếu có sau khi chuyển hướng)
+if (isset($_SESSION['success_message'])) {
+    $success_message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']); // Xóa ngay sau khi hiển thị
+}
+
+// Giữ lại dữ liệu cũ đã nhập (trừ mật khẩu)
+$old_data = [
+    'full_name' => $_POST['full_name'] ?? '',
+    'username' => $_POST['username'] ?? '',
+    'email' => $_POST['email'] ?? '',
+];
+
 include '../View/user/register.php';
-?>
