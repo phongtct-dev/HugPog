@@ -1,23 +1,30 @@
 <?php
-require_once '../includes/controllers/ProductController.php';
-require_once '../models/OrderModel.php';     
+// Nạp autoloader và config
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/config.php';
 
+// Khai báo các lớp sẽ sử dụng
+use App\Controllers\ProductController;
+use App\Controllers\CartController;
+use App\Controllers\CategoryController;
+use App\Models\OrderModel;
+
+// Khởi tạo các controller và model
 $productController = new ProductController();
 $order_model = new OrderModel();
+$cartController = new CartController();
+$categoryController = new CategoryController();
 
+// Chuẩn bị dữ liệu cho Header
+$cart_qty = $cartController->getCartQuantity();
+$categories = $categoryController->listCategories();
+$is_logged_in = isset($_SESSION['user_id']);
+$logged_in_username = $_SESSION['username'] ?? 'Khách';
 
-// 3. Lấy dữ liệu cần thiết cho trang chủ
-// Giả định hàm này lấy tất cả sản phẩm đang hoạt động, đã được tính toán giá giảm
-// (như được định nghĩa trong ProductController và ProductModel).
+// Dữ liệu cho nội dung chính của trang
 $allProduct = $productController->getProductsForHomePage();
-
-// 5. Logic phân chia sản phẩm (để hiển thị theo cột trong giao diện)
-// Giả định muốn hiển thị tối đa 16 sản phẩm (4 hàng x 4 cột)
-$bestSellers = array_slice($allProduct, 0, 4);
-// Số sản phẩm muốn hiển thị trong mỗi cột của khối "Sản phẩm bán chạy"
-$productsPerBlock = ceil(count($bestSellers) / 4);
-$productBlocks = array_chunk($bestSellers, 1);
 $top_products = $order_model->getTopSellingProducts(4) ?? [];
+$productBlocks = !empty($allProduct) ? array_chunk($allProduct, 1) : [];
 
-include '../view/user/index.php';
-?>
+// Hiển thị view
+include __DIR__ . '/../view/user/index.php';

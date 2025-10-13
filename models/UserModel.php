@@ -1,4 +1,6 @@
 <?php
+
+namespace App\Models;
 // File: project/models/UserModel.php
 
 // Nhúng file kết nối DB để sử dụng hàm db_connect()
@@ -38,9 +40,9 @@ class UserModel
         $conn = db_connect();
         $sql = "INSERT INTO users (username, email, password_hash, full_name, phone, birth_date, status, `rank`) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        
+
         $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
-        
+
         $phone = $data['phone'] ?? NULL;
         $birth_date = $data['birth_date'] ?? NULL;
 
@@ -65,22 +67,25 @@ class UserModel
 
     /**
      * Hàm này tìm và lấy thông tin của một người dùng dựa trên username.
-     * Chúng ta cần lấy password_hash để so sánh và id, username để lưu vào session.
+     * (Đã nâng cấp để lấy thêm thông tin profile cho session).
      * @param string $username - Tên đăng nhập cần tìm.
      * @return array|null - Trả về một mảng chứa thông tin user, hoặc null nếu không tìm thấy.
      */
     public function findUserByUsername($username)
     {
         $conn = db_connect();
-        // Lấy các cột cần thiết để xác thực và lưu session
-        $sql = "SELECT id, username, password_hash, status FROM users WHERE username = ?";
+
+        // SỬA Ở ĐÂY: Thêm các cột full_name, phone, address vào câu lệnh SELECT
+        $sql = "SELECT id, username, password_hash, status, full_name, phone, address 
+            FROM users 
+            WHERE username = ?";
+
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('s', $username);
         $stmt->execute();
 
-        // Lấy kết quả
         $result = $stmt->get_result();
-        $user = $result->fetch_assoc(); // fetch_assoc() lấy 1 dòng kết quả
+        $user = $result->fetch_assoc();
 
         $stmt->close();
         $conn->close();
@@ -180,7 +185,7 @@ class UserModel
     }
 
     /**
-     * Cập nhật thông tin người dùng từ admin. (Giờ đã bao gồm cập nhật trạng thái)
+     * Cập nhật thông tin người dùng. (Phiên bản có GỠ LỖI CHI TIẾT)
      * @param int $userId ID người dùng.
      * @param array $data Dữ liệu cần cập nhật.
      * @return bool
@@ -192,25 +197,49 @@ class UserModel
         $params = [];
         $types = "";
 
-        // Tạo câu lệnh SET động và mảng tham số
-        if (isset($data['username'])) { $setClauses[] = "username = ?"; $params[] = $data['username']; $types .= "s"; }
-        if (isset($data['email'])) { $setClauses[] = "email = ?"; $params[] = $data['email']; $types .= "s"; }
-        if (!empty($data['password'])) { 
-            $setClauses[] = "password_hash = ?"; 
-            $params[] = password_hash($data['password'], PASSWORD_DEFAULT); 
-            $types .= "s"; 
-        } 
-        if (isset($data['full_name'])) { $setClauses[] = "full_name = ?"; $params[] = $data['full_name']; $types .= "s"; }
-        if (isset($data['phone'])) { $setClauses[] = "phone = ?"; $params[] = $data['phone']; $types .= "s"; }
-        // Đã bỏ birth_date/gender/role
-
-        // Cập nhật trạng thái người dùng (active/locked)
-        if (isset($data['status'])) { 
-            $setClauses[] = "status = ?"; 
-            $params[] = (strtolower($data['status']) === 'locked') ? 'locked' : 'active'; 
-            $types .= "s"; 
+        // Xây dựng các phần của câu lệnh SQL
+        if (isset($data['full_name'])) {
+            $setClauses[] = "full_name = ?";
+            $params[] = $data['full_name'];
+            $types .= "s";
         }
-        if (isset($data['rank'])) { $setClauses[] = "`rank` = ?"; $params[] = $data['rank']; $types .= "s"; }
+        if (isset($data['phone'])) {
+            $setClauses[] = "phone = ?";
+            $params[] = $data['phone'];
+            $types .= "s";
+        }
+        if (isset($data['address'])) {
+            $setClauses[] = "address = ?";
+            $params[] = $data['address'];
+            $types .= "s";
+        }
+
+        if (!empty($data['password'])) {
+            $setClauses[] = "password_hash = ?";
+            $params[] = password_hash($data['password'], PASSWORD_DEFAULT);
+            $types .= "s";
+        }
+
+        if (isset($data['username'])) {
+            $setClauses[] = "username = ?";
+            $params[] = $data['username'];
+            $types .= "s";
+        }
+        if (isset($data['email'])) {
+            $setClauses[] = "email = ?";
+            $params[] = $data['email'];
+            $types .= "s";
+        }
+        if (isset($data['status'])) {
+            $setClauses[] = "status = ?";
+            $params[] = $data['status'];
+            $types .= "s";
+        }
+        if (isset($data['rank'])) {
+            $setClauses[] = "`rank` = ?";
+            $params[] = $data['rank'];
+            $types .= "s";
+        }
 
         if (empty($setClauses)) {
             $conn->close();
@@ -218,29 +247,30 @@ class UserModel
         }
 
         $sql = "UPDATE users SET " . implode(", ", $setClauses) . " WHERE id = ?";
-        
         $params[] = $userId;
         $types .= "i";
 
         $stmt = $conn->prepare($sql);
 
-        $bind_names = [$types];
-        for ($i = 0; $i < count($params); $i++) {
-            $bind_names[] = &$params[$i];
+        if ($types && $params) {
+            $stmt->bind_param($types, ...$params);
         }
-        call_user_func_array([$stmt, 'bind_param'], $bind_names);
 
         $success = $stmt->execute();
+
+
+
         $stmt->close();
         $conn->close();
         return $success;
     }
-
     public function getUserById($userId)
     {
         $conn = db_connect();
-        $sql = "SELECT id, username, email, full_name, phone, birth_date, `rank`, total_spent, status, created_at 
+        // SỬA Ở ĐÂY: Thêm `address` vào sau `phone`
+        $sql = "SELECT id, username, email, full_name, phone, address, birth_date, `rank`, total_spent, status, created_at 
             FROM users WHERE id = ?";
+
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
@@ -250,20 +280,127 @@ class UserModel
         $conn->close();
         return $user ?: null;
     }
-
     public function getUserByEmail($email)
     {
-        global $pdo;
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $conn = db_connect(); // Sử dụng kết nối MySQLi của dự án
+        $sql = "SELECT * FROM users WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        // $conn->close(); // Tạm thời giữ lại nếu chưa tối ưu CSDL
+        return $user;
     }
 
     public function resetPasswordByEmail($email, $new_hashed_password)
     {
-        global $pdo;
-        // Cập nhật trường 'password' cho người dùng có 'email' tương ứng
-        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
-        return $stmt->execute([$new_hashed_password, $email]);
+        $conn = db_connect();
+        // Sửa lại tên cột từ 'password' thành 'password_hash' cho đúng với CSDL
+        $sql = "UPDATE users SET password_hash = ? WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $new_hashed_password, $email);
+        $success = $stmt->execute();
+        $stmt->close();
+        // $conn->close(); // Tạm thời giữ lại nếu chưa tối ưu CSDL
+        return $success;
+    }
+
+
+    /**
+     * Tìm một yêu cầu reset mật khẩu hợp lệ bằng token.
+     * @param string $token
+     * @return array|null
+     */
+    public function findPasswordResetByToken($token)
+    {
+        $conn = db_connect();
+        $sql = "SELECT * FROM password_resets WHERE token = ? AND expires_at > NOW() LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('s', $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $resetRequest = $result->fetch_assoc();
+        $stmt->close();
+        return $resetRequest;
+    }
+
+    /**
+     * Cập nhật mật khẩu của người dùng dựa trên email.
+     * @param string $email
+     * @param string $newPassword
+     * @return bool
+     */
+    public function updateUserPassword($email, $newPassword)
+    {
+        $conn = db_connect();
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $sql = "UPDATE users SET password_hash = ? WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ss', $hashedPassword, $email);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
+    }
+
+    /**
+     * Xóa token reset mật khẩu sau khi đã sử dụng.
+     * @param string $token
+     * @return void
+     */
+    public function deletePasswordResetToken($token)
+    {
+        $conn = db_connect();
+        $sql = "DELETE FROM password_resets WHERE token = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('s', $token);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+
+    /**
+     * Tìm người dùng bằng địa chỉ email.
+     * @param string $email
+     * @return array|null
+     */
+    public function findUserByEmail($email)
+    {
+        $conn = db_connect();
+        $sql = "SELECT id, email, full_name FROM users WHERE email = ? LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        return $user;
+    }
+
+    /**
+     * Lưu token reset mật khẩu vào CSDL.
+     * @param string $email
+     * @param string $token
+     * @param string $expiresAt
+     * @return bool
+     */
+    public function storePasswordResetToken($email, $token, $expiresAt)
+    {
+        $conn = db_connect();
+        // Xóa token cũ của email này nếu có để tránh trùng lặp
+        $sqlDelete = "DELETE FROM password_resets WHERE email = ?";
+        $stmtDelete = $conn->prepare($sqlDelete);
+        $stmtDelete->bind_param('s', $email);
+        $stmtDelete->execute();
+        $stmtDelete->close();
+
+        // Thêm token mới
+        $sql = "INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('sss', $email, $token, $expiresAt);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
     }
 }

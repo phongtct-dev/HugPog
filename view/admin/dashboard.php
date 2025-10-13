@@ -20,8 +20,8 @@ function format_currency_vn($amount)
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/perfect-scrollbar@1.5.5/css/perfect-scrollbar.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../public/css/style.css">
-    <link rel="stylesheet" href="../../public/css/app.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/app.css">
 
 </head>
 
@@ -240,8 +240,8 @@ function format_currency_vn($amount)
         new PerfectScrollbar('#sidebar');
     </script>
 
-    <script src="/HugPog/public/js/main.js"></script>
-    <script src="/HugPog/public/js/api_admin.js"></script>
+    <script src="<?php echo BASE_URL; ?>public/js/main.js"></script>
+    <script src="<?php echo BASE_URL; ?>public/js/api_admin.js"></script>
 
     <script>
         const REVENUE_CHART_DATA = <?php echo json_encode($revenue_chart_data); ?>;

@@ -1,8 +1,8 @@
 <?php
-// File: project/public/add_to_cart.php
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/config.php';
 
-
-require_once '../includes/controllers/CartController.php';
+use App\Controllers\CartController;
 
 $cartController = new CartController();
 $cartController->handleAddToCart();

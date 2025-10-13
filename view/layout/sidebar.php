@@ -50,7 +50,7 @@ include_once '../../includes/config.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/perfect-scrollbar@1.5.5/css/perfect-scrollbar.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/HugPog/public/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
 
 </head>
 
@@ -61,7 +61,7 @@ include_once '../../includes/config.php';
                 <div class="d-flex justify-content-between">
                     <div class="logo">
                         <a href="<?= BASE_URL ?>public/admin/dashboard.php"><img
-                                src="/HugPog/public/asset/image/logo.png"
+                                src="<?php echo BASE_URL; ?>public/asset/image/logo.png"
                                 alt="Logo"
                                 class="img-fluid custom-logo-size"
                                 style="height: auto !important; width: auto;" /></a>

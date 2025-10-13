@@ -1,4 +1,6 @@
 <?php
+
+namespace App\Models;
 // File: project/models/OrderModel.php
 
 require_once __DIR__ . '/../includes/db_connect.php';
@@ -76,7 +78,7 @@ class OrderModel
             $conn->commit();
             $conn->close();
             return $orderId;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $conn->rollback();
             $conn->close();
             error_log($e->getMessage());
@@ -161,8 +163,8 @@ class OrderModel
      */
     public function listOrdersForAdmin()
     {
-        $orderModel = new OrderModel();
-        return $orderModel->getAllOrders();
+       
+        return $this->getAllOrders();
     }
 
     /**
@@ -173,8 +175,8 @@ class OrderModel
     {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $orderId = intval($_GET['id']);
-            $orderModel = new OrderModel();
-            return $orderModel->getOrderDetailsById($orderId);
+            
+            return $this->getOrderDetailsById($orderId);
         }
         return null;
     }
@@ -188,8 +190,8 @@ class OrderModel
             $orderId = intval($_POST['order_id']);
             $newStatus = $_POST['status'];
 
-            $orderModel = new OrderModel();
-            $orderModel->updateOrderStatus($orderId, $newStatus);
+            
+            return $this->updateOrderStatus($orderId, $newStatus);
         }
         // Chuyển hướng về lại trang chi tiết đơn hàng
         header('Location: ' . $_SERVER['HTTP_REFERER']);
@@ -364,7 +366,7 @@ class OrderModel
         // ... (logic truy vấn doanh thu 30 ngày - xem phần giải thích trong Thought)
         $conn = db_connect();
         $data = [];
-        $today = new DateTime();
+        $today = new \DateTime();
         for ($i = 29; $i >= 0; $i--) {
             $date = (clone $today)->modify("-$i days")->format('Y-m-d');
             $data[$date] = 0;

@@ -1,7 +1,10 @@
 <?php
+
+namespace App\Controllers;
 // File: project/includes/controllers/ProductController.php
 
-require_once __DIR__ . '/../../models/ProductModel.php';
+use App\Models\ProductModel;
+
 
 class ProductController
 {
@@ -18,9 +21,10 @@ class ProductController
      */
     public function getProductsForHomePage()
     {
-        // Gọi model để lấy tất cả sản phẩm
-        $products = $this->productModel->getAllActiveProducts();
-        return $products;
+    // Gọi model để lấy 8 sản phẩm đầu tiên cho trang chủ
+    // getAllActiveProducts(limit: 8, offset: 0)
+    $products = $this->productModel->getAllActiveProducts(8, 0); 
+    return $products;
     }
 
     //
@@ -130,4 +134,48 @@ class ProductController
             exit();
         }
     }
+
+            /**
+     * Lấy danh sách sản phẩm có hỗ trợ LỌC và PHÂN TRANG.
+     * @return array Dữ liệu bao gồm sản phẩm, trang hiện tại, và tổng số trang.
+     */
+    public function listProductsWithPagination()
+    {
+         $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($currentPage < 1) $currentPage = 1;
+
+    $productsPerPage = 9;
+    $offset = ($currentPage - 1) * $productsPerPage;
+
+    // Lấy các bộ lọc từ URL
+    $filters = [
+        'categories' => $_GET['categories'] ?? [],
+        'max_price'  => $_GET['max_price'] ?? null,
+        'brands'     => $_GET['brands'] ?? [],
+    ];
+
+    // Đếm tổng sản phẩm DỰA TRÊN BỘ LỌC
+    $totalProducts = $this->productModel->countFilteredProducts($filters);
+    $totalPages = ceil($totalProducts / $productsPerPage);
+
+    // Lấy sản phẩm DỰA TRÊN BỘ LỌC và PHÂN TRANG
+    $products = $this->productModel->filterProducts($filters, $productsPerPage, $offset);
+
+    return [
+        'products' => $products,
+        'currentPage' => $currentPage,
+        'totalPages' => $totalPages,
+        'filters' => $filters // Trả về filters để view giữ trạng thái
+    ];
+    
+    }
+
+    /**
+ * Lấy danh sách thương hiệu duy nhất từ Model.
+ * @return array
+ */
+public function getDistinctBrands()
+{
+    return $this->productModel->getDistinctBrands();
+}
 }

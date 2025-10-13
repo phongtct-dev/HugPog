@@ -1,20 +1,14 @@
 <?php
-// File: project/public/cart.php
-session_start();
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/config.php';
 
-require_once '../includes/controllers/CartController.php';
+use App\Controllers\CartController;
+use App\Controllers\CategoryController;
 
 $cartController = new CartController();
+$categoryController = new CategoryController();
 
-if (!function_exists('formatPrice')) {
-    function formatPrice($price)
-    {
-        // Đảm bảo $price là số và không âm, sau đó định dạng theo chuẩn Việt Nam
-        return number_format(max(0, (float) $price), 0, ',', '.') . ' VNĐ';
-    }
-}
-
-// Xử lý hành động POST
+// Xử lý các hành động POST (Controller tự chuyển hướng)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_cart'])) {
         $cartController->handleUpdateCart();
@@ -27,29 +21,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// 2. Lấy dữ liệu Giỏ hàng (Đã bao gồm khuyến mãi sản phẩm)
+// Chuẩn bị dữ liệu cho Header
+$cart_qty = $cartController->getCartQuantity();
+$categories = $categoryController->listCategories();
+$is_logged_in = isset($_SESSION['user_id']);
+$logged_in_username = $_SESSION['username'] ?? 'Khách';
+
+// Dữ liệu cho nội dung chính
 $cartData = $cartController->getCartItems();
 $cartItems = $cartData['items'];
-$subtotal = $cartData['subtotal']; // Tổng tiền trước khi áp dụng voucher/ship
+$subtotal = $cartData['subtotal'];
+$totalsData = $cartController->calculateCartTotals($subtotal);
+$voucherDiscount = $totalsData['voucherDiscount'];
+$totalAmount = $totalsData['totalAmount'];
 
-// 3. Tính toán tổng tiền cuối cùng (Áp dụng voucher)
-$totals = $cartController->calculateCartTotals($subtotal);
-$voucherDiscount = $totals['voucherDiscount'];
-$totalAmount = $totals['totalAmount'];
-
-
+// Chuẩn bị thông báo
 $message = '';
-if (isset($_SESSION['cart_message'])) {
-    $message .= '<div class="alert alert-success mt-3">' . $_SESSION['cart_message'] . '</div>';
-    unset($_SESSION['cart_message']);
-}
-if (isset($_SESSION['voucher_error'])) {
-    $message .= '<div class="alert alert-danger mt-3">' . $_SESSION['voucher_error'] . '</div>';
-    unset($_SESSION['voucher_error']);
-}
 if (isset($_SESSION['voucher_success'])) {
-    $message .= '<div class="alert alert-success mt-3">' . $_SESSION['voucher_success'] . '</div>';
+    $message = '<div class="alert alert-success">' . $_SESSION['voucher_success'] . '</div>';
     unset($_SESSION['voucher_success']);
 }
+if (isset($_SESSION['voucher_error'])) {
+    $message = '<div class="alert alert-danger">' . $_SESSION['voucher_error'] . '</div>';
+    unset($_SESSION['voucher_error']);
+}
 
-include '../view/user/cart.php';
+function formatPrice($price) {
+    return number_format($price, 0, ',', '.') . ' VNĐ';
+}
+
+include __DIR__ . '/../view/user/cart.php';

@@ -1,8 +1,9 @@
 <?php
+namespace App\Controllers;
 // File: project/includes/controllers/CategoryController.php
-require_once __DIR__ . '/../../models/CategoryModel.php';
-require_once __DIR__ . '/../config.php';
 
+require_once __DIR__ . '/../config.php';
+use App\Models\CategoryModel;
 class CategoryController {
     private $categoryModel;
 
@@ -39,7 +40,7 @@ class CategoryController {
     }
 
     public function handleDeleteCategory() {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+        
         
         $id = intval($_POST['id'] ?? 0);
 

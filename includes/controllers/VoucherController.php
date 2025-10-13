@@ -1,8 +1,9 @@
 <?php
+
+namespace App\Controllers;
 // File: project/includes/controllers/VoucherController.php
 
-require_once __DIR__ . '/../../models/VoucherModel.php';
-// require_once __DIR__ . '/../config.php'; // Giả định file này chứa BASE_URL nếu cần
+use App\Models\VoucherModel;
 
 class VoucherController
 {
@@ -27,7 +28,7 @@ class VoucherController
      */
     public function handleAdminVoucherAction()
     {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+        
 
         // Mặc định Staff ID nếu chưa đăng nhập. Thay '1' bằng logic session thực tế
         $staff_id = $_SESSION['staff_id'] ?? 1;
@@ -113,7 +114,7 @@ class VoucherController
                     $message_content = '❌ Lỗi: ' . $error;
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Bắt lỗi từ Model (ví dụ lỗi MySQLi)
             $message_content = '❌ Lỗi hệ thống: ' . $e->getMessage();
         }

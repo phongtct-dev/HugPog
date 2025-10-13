@@ -7,8 +7,8 @@
     <title>Đăng ký</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/HugPog/public/css/bootstrap.css">
-    <link rel="stylesheet" href="/HugPog/public/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/bootstrap.css">
 </head>
 
 <body>
@@ -79,7 +79,7 @@
     </div>
     <?php include __DIR__ . '/../layout/footer.php'; ?>
 
-    <script src="/HugPog/public/js/main.js"></script>
+    <script src="<?php echo BASE_URL; ?>public/js/main.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,4 +1,6 @@
 <?php
+
+namespace App\Models;
 // File: project/models/VoucherModel.php
 
 require_once __DIR__ . '/../includes/db_connect.php';
@@ -112,7 +114,7 @@ class VoucherModel
             error_log("MySQLi Error in updateVoucher: " . $error_message);
             $stmt->close();
             $conn->close();
-            throw new Exception($error_message);
+            throw new \Exception($error_message);
         }
 
         $stmt->close();

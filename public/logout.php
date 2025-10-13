@@ -1,8 +1,9 @@
 <?php
-// File: project/public/logout.php
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/config.php';
 
-require_once '../includes/controllers/UserController.php';
+use App\Controllers\UserController;
 
-$userController = new UserController();
-$userController->handleLogout();
+$controller = new UserController();
+$controller->handleLogout();
 ?>

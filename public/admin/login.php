@@ -1,10 +1,10 @@
 <?php
-// File: project/public/admin/index.php
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../includes/config.php';
 
-require_once '../../includes/controllers/StaffController.php';
+use App\Controllers\StaffController;
 
 $staffController = new StaffController();
 $errors = $staffController->handleLogin();
 
-include '../../View/admin/login.php';
-?>
+include __DIR__ . '/../../view/admin/login.php';

@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 
@@ -8,13 +7,13 @@
   <title>Quên Mật Khẩu</title>
   <link rel="shortcut icon" type="image/png" href="./assets/images/logos/favicon.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/HugPog/public/css/style.css">
-    <link rel="stylesheet" href="/HugPog/public/css/bootstrap.css">
+  <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
+  <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/bootstrap.css">
 
 </head>
 
 <body>
-    <?php include __DIR__ . '/../layout/header.php'; ?>
+  <?php include __DIR__ . '/../layout/header.php'; ?>
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
     <div
@@ -27,15 +26,9 @@
                 <h2 class="text-center">Quên Mật Khẩu</h2>
                 <p class="text-center mb-5">Nhập email của bạn để chúng tôi gửi lại mật khẩu.</p>
 
-                <?php if ($success_message): ?>
-                  <div class="alert alert-success" role="alert">
-                    <?php echo $success_message; ?>
-                  </div>
-                <?php endif; ?>
-
-                <?php if ($error_message): ?>
-                  <div class="alert alert-danger" role="alert">
-                    <?php echo $error_message; ?>
+                <?php if (!empty($message)): ?>
+                  <div class="alert alert-<?php echo htmlspecialchars($message['type']); ?>" role="alert">
+                    <?php echo htmlspecialchars($message['text']); ?>
                   </div>
                 <?php endif; ?>
 
@@ -58,7 +51,7 @@
       </div>
     </div>
   </div>
-      <?php include __DIR__ . '/../layout/footer.php'; ?>
+  <?php include __DIR__ . '/../layout/footer.php'; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

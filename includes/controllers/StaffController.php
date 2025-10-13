@@ -1,8 +1,10 @@
 <?php
+
+namespace App\Controllers;
 // File: project/includes/controllers/StaffController.php
 
-require_once __DIR__ . '/../../models/StaffModel.php';
 require_once __DIR__ . '/../config.php';
+use App\Models\StaffModel;
 
 class StaffController
 {
@@ -11,7 +13,7 @@ class StaffController
      */
     public function handleLogin()
     {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+       
 
         // Nếu đã đăng nhập, chuyển thẳng vào dashboard
         if (isset($_SESSION['staff_id'])) {

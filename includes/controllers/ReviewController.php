@@ -1,16 +1,19 @@
 <?php
+
+namespace App\Controllers;
 // File: project/includes/controllers/ReviewController.php
 
-require_once __DIR__ . '/../../models/ReviewModel.php';
-require_once __DIR__ . '/../../models/OrderModel.php';
 require_once __DIR__ . '/../config.php';
+use App\Models\ReviewModel;
+use App\Models\OrderModel;
+
 
 class ReviewController {
     /**
      * Xử lý việc gửi đánh giá.
      */
     public function handleSubmitReview() {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+       
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
             $userId = $_SESSION['user_id'];
@@ -105,7 +108,7 @@ class ReviewController {
                     if (!isset($message_type)) {
                         $message_type = $result ? 'success' : 'error';
                     }
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $message_content = '❌ Lỗi hệ thống: ' . $e->getMessage();
                     $message_type = 'error';
                 }

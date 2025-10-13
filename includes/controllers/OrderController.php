@@ -1,12 +1,22 @@
 <?php
+
+namespace App\Controllers;
 // File: project/includes/controllers/OrderController.php
 
-require_once __DIR__ . '/../../models/OrderModel.php';
-require_once __DIR__ . '/../../models/CartModel.php';
-require_once __DIR__ . '/../../models/ProductModel.php';
-require_once __DIR__ . '/../../models/voucherModel.php';
+require_once __DIR__ . '/../config.php';
+
+use App\Models\OrderModel;
+use App\Models\CartModel;
+use App\Models\ProductModel;
+use App\Models\VoucherModel;
+use App\Models\UserModel;
 
 
+
+// === THÊM 2 DÒNG NÀY VÀO ĐỂ GỬI GMAIL===
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+// =============================
 
 
 class OrderController
@@ -27,7 +37,7 @@ class OrderController
      */
     public function handlePlaceOrder()
     {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+
 
         if (!isset($_SESSION['user_id']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . 'public/login.php');
@@ -82,7 +92,13 @@ class OrderController
         $orderId = $orderModel->createOrder($userId, $customerName, $shippingAddress, $phone, $cartItems, $totalAmount, $voucher);
 
         if ($orderId) {
+            // Xóa voucher khỏi session sau khi đã dùng
             unset($_SESSION['voucher']);
+
+            // GỌI HÀM GỬI EMAIL HÓA ĐƠN
+            $this->sendOrderConfirmationEmail($orderId);
+
+            // Chuyển hướng đến trang báo thành công
             header('Location: ' . BASE_URL . 'public/order_success.php?order_id=' . $orderId);
             exit();
         } else {
@@ -391,6 +407,83 @@ class OrderController
             'voucherDiscount' => $voucherDiscount,
             'totalAmount' => $totalAmount,
         ];
+    }
+
+    /**
+     * Soạn và gửi email xác nhận đơn hàng (hóa đơn) cho khách hàng.
+     * @param int $orderId Mã đơn hàng vừa tạo.
+     * @return bool True nếu gửi thành công, false nếu thất bại.
+     */
+    private function sendOrderConfirmationEmail($orderId)
+    {
+        $orderModel = new OrderModel();
+        // Lấy thông tin chi tiết đơn hàng, bao gồm cả sản phẩm
+        $order = $orderModel->getOrderDetailsById($orderId);
+
+        if (!$order) {
+            error_log("Gửi mail thất bại: Không tìm thấy đơn hàng ID " . $orderId);
+            return false;
+        }
+
+        $userModel = new UserModel();
+        // Lấy thông tin người dùng để có email
+        $user = $userModel->getUserById($order['user_id']);
+        if (!$user) {
+            error_log("Gửi mail thất bại: Không tìm thấy người dùng cho đơn hàng ID " . $orderId);
+            return false;
+        }
+
+        // Bắt đầu soạn nội dung email (HTML)
+        $emailBody = "<h1>Xác nhận đơn hàng #" . htmlspecialchars($orderId) . "</h1>";
+        $emailBody .= "<p>Xin chào " . htmlspecialchars($order['customer_name']) . ",</p>";
+        $emailBody .= "<p>Cảm ơn bạn đã đặt hàng tại HugPog Store. Dưới đây là chi tiết đơn hàng của bạn:</p>";
+        $emailBody .= "<table border='1' cellpadding='10' cellspacing='0' style='width: 100%; border-collapse: collapse; border-color: #ddd;'>";
+        $emailBody .= "<thead><tr style='background-color: #f2f2f2;'><th>Sản phẩm</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead>";
+        $emailBody .= "<tbody>";
+
+        foreach ($order['items'] as $item) {
+            $emailBody .= "<tr>";
+            $emailBody .= "<td>" . htmlspecialchars($item['name']) . "</td>";
+            $emailBody .= "<td style='text-align: center;'>" . $item['quantity'] . "</td>";
+            $emailBody .= "<td style='text-align: right;'>" . number_format($item['price'], 0, ',', '.') . " VNĐ</td>";
+            $emailBody .= "<td style='text-align: right;'>" . number_format($item['price'] * $item['quantity'], 0, ',', '.') . " VNĐ</td>";
+            $emailBody .= "</tr>";
+        }
+
+        $emailBody .= "</tbody></table>";
+        $emailBody .= "<p style='text-align: right; margin-top: 15px;'><strong>Tổng cộng: " . number_format($order['total_amount'], 0, ',', '.') . " VNĐ</strong></p>";
+        $emailBody .= "<p>Chúng tôi sẽ xử lý và giao đơn hàng của bạn đến địa chỉ: " . htmlspecialchars($order['shipping_address']) . " trong thời gian sớm nhất.</p>";
+        $emailBody .= "<p>Trân trọng,<br>Đội ngũ HugPog</p>";
+
+        // Bắt đầu gửi email
+        $mail = new PHPMailer(true);
+        try {
+            // Cấu hình SMTP (sao chép từ UserController và điền thông tin)
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'tranphong1318@gmail.com'; // << THAY EMAIL CỦA 
+            $mail->Password   = 'hjau zrbz ykza gsea';    // << THAY MẬT KHẨU ỨNG DỤNG
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+            $mail->CharSet    = 'UTF-8';
+
+            // Người gửi và người nhận
+            $mail->setFrom('your_email@gmail.com', 'HugPog Store');
+            $mail->addAddress($user['email'], $order['customer_name']);
+
+            // Nội dung
+            $mail->isHTML(true);
+            $mail->Subject = 'Xac nhan don hang #' . $orderId . ' tu HugPog Store';
+            $mail->Body    = $emailBody;
+
+            $mail->send();
+            return true;
+        } catch (\Exception $e) {
+            // Ghi log lỗi để bạn có thể xem lại nếu có vấn đề, không hiển thị cho người dùng
+            error_log("Lỗi gửi email hóa đơn #" . $orderId . ": " . $mail->ErrorInfo);
+            return false;
+        }
     }
 }
 

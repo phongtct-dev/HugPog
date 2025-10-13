@@ -1,39 +1,33 @@
 <?php
-// File: register.php
+// Nạp autoloader và config
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/config.php';
 
-// Khởi động session để lưu thông báo thành công (nếu có)
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// Khai báo lớp sẽ sử dụng
+use App\Controllers\UserController;
 
-require_once __DIR__ . '../../includes/controllers/UserController.php';
-
-// Khởi tạo Controller
 $userController = new UserController();
 
-// Gọi hàm xử lý đăng ký, hàm này sẽ trả về mảng lỗi (trống nếu thành công hoặc POST chưa được gửi)
+// Xử lý logic đăng ký
 $errors = $userController->handleRegister();
 
-// Xử lý thông báo
-$error_message = '';
-$success_message = '';
-
-// Nếu có lỗi, nối các lỗi lại thành một chuỗi để hiển thị
-if (!empty($errors)) {
-    $error_message = implode("<br>", $errors);
-}
-
-// Lấy thông báo thành công từ SESSION (nếu có sau khi chuyển hướng)
-if (isset($_SESSION['success_message'])) {
-    $success_message = $_SESSION['success_message'];
-    unset($_SESSION['success_message']); // Xóa ngay sau khi hiển thị
-}
-
-// Giữ lại dữ liệu cũ đã nhập (trừ mật khẩu)
+// Lấy dữ liệu cũ để điền lại vào form nếu có lỗi
 $old_data = [
     'full_name' => $_POST['full_name'] ?? '',
     'username' => $_POST['username'] ?? '',
     'email' => $_POST['email'] ?? '',
 ];
 
-include '../View/user/register.php';
+// Chuẩn bị dữ liệu cho header
+$cart_qty = 0;
+$categories = [];
+$is_logged_in = false;
+$logged_in_username = 'Khách';
+
+// Lấy thông báo lỗi/thành công (nếu có)
+$error_message = !empty($errors) ? implode('<br>', $errors) : '';
+$success_message = $_SESSION['success_message'] ?? '';
+unset($_SESSION['success_message']);
+
+// Hiển thị view
+include __DIR__ . '/../view/user/register.php';

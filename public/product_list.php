@@ -1,26 +1,37 @@
 <?php
-// File: project/public/index.php (Phiên bản Tìm kiếm Nâng cao)
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/config.php';
 
-require_once '../includes/controllers/ProductController.php';
-require_once '../includes/controllers/CategoryController.php';
+use App\Controllers\ProductController;
+use App\Controllers\CategoryController;
+use App\Controllers\CartController;
 
 $productController = new ProductController();
 $categoryController = new CategoryController();
+$cartController = new CartController();
 
-// 1. Luôn lấy danh sách danh mục và thương hiệu để hiển thị form bộ lọc
+// Dữ liệu cho Header
+$cart_qty = $cartController->getCartQuantity();
 $categories = $categoryController->listCategories();
-$brands = $productController->productModel->getDistinctBrands();
+$is_logged_in = isset($_SESSION['user_id']);
+$logged_in_username = $_SESSION['username'] ?? 'Khách';
 
-// 2. Lấy các giá trị lọc từ URL mà người dùng gửi lên (qua method GET)
+// Dữ liệu cho nội dung chính của trang (LỌC và PHÂN TRANG)
+// TODO: Tích hợp logic lọc vào đây
 $filters = [
-    'categories' => $_GET['categories'] ?? [], // Lấy mảng các danh mục
-    'max_price'  => $_GET['max_price'] ?? null,   // Lấy giá tối đa
-    'brands'     => $_GET['brands'] ?? []      // Lấy mảng các thương hiệu
+    'categories' => $_GET['categories'] ?? [],
+    'max_price'  => $_GET['max_price'] ?? null,
+    'brands'     => $_GET['brands'] ?? [],
 ];
+$brands = $productController->getDistinctBrands();
 
-// 3. Gọi hàm filterProducts trong Model để lấy sản phẩm theo đúng bộ lọc
-$products = $productController->productModel->filterProducts($filters);
+// --- THAY ĐỔI CHÍNH Ở ĐÂY ---
+// Gọi hàm mới để lấy dữ liệu phân trang
+$paginationData = $productController->listProductsWithPagination();
 
-// 4. Nạp file giao diện và truyền tất cả dữ liệu cần thiết qua
-include '../view/user/product_list.php';
-?>
+// Trích xuất các biến để view sử dụng
+$products = $paginationData['products'];
+$currentPage = $paginationData['currentPage'];
+$totalPages = $paginationData['totalPages'];
+
+include __DIR__ . '/../view/user/product_list.php';

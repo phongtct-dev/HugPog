@@ -1,20 +1,17 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../includes/config.php';
+require_once __DIR__ . '/../../includes/helpers/admin_auth.php';
 
-require_once '../../includes/config.php';
-require_once '../../includes/controllers/CategoryController.php'; // Sử dụng CategoryController
+require_admin_login();
+
+use App\Controllers\CategoryController;
 
 $categoryController = new CategoryController();
 
-// =================================================================================
-// LOGIC XỬ LÝ POST REQUEST
-// =================================================================================
+// Xử lý POST request nếu có
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $action_type = $_POST['action_type'] ?? '';
-
     switch ($action_type) {
         case 'create':
             $categoryController->handleCreateCategory();
@@ -25,17 +22,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         case 'delete':
             $categoryController->handleDeleteCategory();
             break;
-        default:
-            break;
     }
 }
 
-// Lấy danh sách danh mục để hiển thị
+// Lấy dữ liệu cho view
 $categories = $categoryController->listCategories();
-
-// Lấy và xóa thông báo sau khi hiển thị
 $success_message = $_SESSION['success_message'] ?? null;
 $error_message = $_SESSION['error_message'] ?? null;
 unset($_SESSION['success_message'], $_SESSION['error_message']);
-include '../../View/admin/category_management.php';
-?>
+
+include __DIR__ . '/../../view/admin/category_management.php';

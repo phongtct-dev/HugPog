@@ -1,10 +1,15 @@
 <?php
+
+namespace App\Controllers;
+
 // File: project/includes/controllers/CartController.php (Phiên bản đã sửa)
 require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../../models/CartModel.php';
-require_once __DIR__ . '/../../models/VoucherModel.php';
-require_once __DIR__ . '/../../models/ProductModel.php';
-require_once __DIR__ . '/../../models/OrderModel.php';
+// Thêm các lệnh "use" để khai báo Model
+use App\Models\CartModel;
+use App\Models\VoucherModel;
+use App\Models\ProductModel;
+// OrderModel được dùng trong file khác, nhưng để đây cũng không sao
+use App\Models\OrderModel;
 
 class CartController
 {
@@ -142,7 +147,7 @@ class CartController
 
     public function getCartItems()
     {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+        
         $finalItems = [];
         $subtotal = 0;
 

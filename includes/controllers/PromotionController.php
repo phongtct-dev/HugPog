@@ -1,8 +1,10 @@
 <?php
+
+namespace App\Controllers;
 // File: project/includes/controllers/PromotionController.php
-require_once __DIR__ . '/../../models/PromotionModel.php';
-require_once __DIR__ . '/../../models/ProductModel.php';
 require_once __DIR__ . '/../config.php';
+use App\Models\PromotionModel;
+use App\Models\ProductModel;
 
 class PromotionController
 {
@@ -30,7 +32,7 @@ class PromotionController
 
     public function handleSavePromotion()
     {
-        if (session_status() == PHP_SESSION_NONE) session_start();
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'product_id'       => intval($_POST['product_id']),
@@ -110,7 +112,7 @@ class PromotionController
                     $message_content = $result ? '✅ Thêm Khuyến Mãi thành công!' : '❌ Lỗi: Thêm Khuyến Mãi thất bại.';
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Promotion Admin Action Error: " . $e->getMessage());
             $message_content = '❌ Lỗi hệ thống: Đã xảy ra sự cố không mong muốn.';
         }

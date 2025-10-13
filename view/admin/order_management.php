@@ -1,17 +1,4 @@
-<?php
-require_once __DIR__ . '/../../includes/controllers/OrderController.php';
-$controller = new OrderController();
-$orders = $controller->listOrdersForAdmin();
-$orderDetails = []; // nếu bạn có dữ liệu chi tiết, có thể nạp ở đây
-$status_options = [
-    'Chờ Xác nhận' => 'Chờ Xác nhận',
-    'Đã Xác nhận' => 'Đã Xác nhận',
-    'Đang giao' => 'Đang giao',
-    'Đã giao' => 'Đã giao',
-    'Thành công' => 'Thành công',
-    'Đã hủy' => 'Đã hủy',
-];
-?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -21,8 +8,8 @@ $status_options = [
     <title>Quản lý Đơn hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/HugPog/public/css/style.css">
-    <link rel="stylesheet" href="/HugPog/public/css/app.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/app.css">
 </head>
 
 <body>

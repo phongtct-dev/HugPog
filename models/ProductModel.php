@@ -1,4 +1,6 @@
 <?php
+
+namespace App\Models;
 // File: project/models/ProductModel.php
 
 require_once __DIR__ . '/../includes/db_connect.php';
@@ -6,21 +8,27 @@ require_once __DIR__ . '/../includes/db_connect.php';
 class ProductModel
 {
     /**
-     * Lấy tất cả sản phẩm đang ở trạng thái 'active'.
-     * @return array Mảng chứa danh sách các sản phẩm.
+     * Lấy các sản phẩm đang 'active' với giới hạn và vị trí bắt đầu (phân trang).
+     * @param int $limit Số sản phẩm mỗi trang.
+     * @param int $offset Vị trí bắt đầu lấy.
+     * @return array
      */
-     public function getAllActiveProducts()
+    public function getAllActiveProducts($limit, $offset)
     {
         $conn = db_connect();
-        $sql = "SELECT p.*, p.image_url, c.name AS category_name, p.brand,
-                       pd.discount_percent, 
-                       (p.price * (1 - pd.discount_percent / 100)) as discounted_price
-                FROM products p
-                LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN product_discounts pd ON p.id = pd.product_id AND CURDATE() BETWEEN pd.start_date AND pd.end_date
-                WHERE p.status = 'active'
-                ORDER BY p.created_at DESC";
-        $result = $conn->query($sql);
+        $sql = "SELECT p.*, c.name AS category_name, pd.discount_percent, 
+                        (p.price * (1 - pd.discount_percent / 100)) as discounted_price
+                    FROM products p
+                    LEFT JOIN categories c ON p.category_id = c.id
+                    LEFT JOIN product_discounts pd ON p.id = pd.product_id AND CURDATE() BETWEEN pd.start_date AND pd.end_date
+                    WHERE p.status = 'active'
+                    ORDER BY p.created_at DESC
+                    LIMIT ? OFFSET ?";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
@@ -145,6 +153,7 @@ class ProductModel
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
+
     /**
      * Lấy tất cả các thương hiệu (brand) duy nhất để hiển thị trong bộ lọc.
      * @return array
@@ -154,63 +163,59 @@ class ProductModel
         $conn = db_connect();
         $sql = "SELECT DISTINCT brand FROM products WHERE brand IS NOT NULL AND brand != '' ORDER BY brand ASC";
         $result = $conn->query($sql);
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $brands = $result->fetch_all(MYSQLI_ASSOC);
+        $conn->close(); // 
+        return $brands;
     }
 
     /**
-     * Lọc sản phẩm theo nhiều tiêu chí (danh mục, giá, thương hiệu).
-     * Hàm này sẽ tự động xây dựng câu lệnh SQL dựa trên các bộ lọc được cung cấp.
-     * @param array $filters - Mảng chứa các điều kiện lọc.
-     * @return array - Mảng các sản phẩm đã được lọc.
+     * Lọc sản phẩm theo nhiều tiêu chí VÀ hỗ trợ phân trang.
+     * @param array $filters
+     * @param int $limit
+     * @param int $offset
+     * @return array
      */
-    public function filterProducts($filters)
+    public function filterProducts($filters, $limit, $offset)
     {
         $conn = db_connect();
-
-        // Bắt đầu câu lệnh SQL cơ bản
         $sql = "SELECT p.*, c.name AS category_name, 
-                       pd.discount_percent, 
-                       (p.price * (1 - pd.discount_percent / 100)) as discounted_price
-                FROM products p
-                LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN product_discounts pd ON p.id = pd.product_id AND CURDATE() BETWEEN pd.start_date AND pd.end_date
-                WHERE p.status = 'active'";
+                   pd.discount_percent, 
+                   (p.price * (1 - pd.discount_percent / 100)) as discounted_price
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN product_discounts pd ON p.id = pd.product_id AND CURDATE() BETWEEN pd.start_date AND pd.end_date
+            WHERE p.status = 'active'";
 
-        $params = []; // Mảng chứa các giá trị để bind vào câu lệnh
-        $types = '';  // Chuỗi chứa kiểu dữ liệu của các tham số (ví dụ: 'iis')
+        $params = [];
+        $types = '';
 
-        // Thêm điều kiện lọc theo DANH MỤC (nếu người dùng chọn)
         if (!empty($filters['categories'])) {
             $placeholders = implode(',', array_fill(0, count($filters['categories']), '?'));
             $sql .= " AND p.category_id IN ($placeholders)";
             $types .= str_repeat('i', count($filters['categories']));
             $params = array_merge($params, $filters['categories']);
         }
-
-        // Thêm điều kiện lọc theo GIÁ TỐI ĐA (nếu người dùng kéo thanh trượt)
         if (!empty($filters['max_price'])) {
             $sql .= " AND p.price <= ?";
-            $types .= 'd'; // d là kiểu double/float
+            $types .= 'd';
             $params[] = $filters['max_price'];
         }
-
-        // Thêm điều kiện lọc theo THƯƠNG HIỆU (nếu người dùng chọn)
         if (!empty($filters['brands'])) {
             $placeholders = implode(',', array_fill(0, count($filters['brands']), '?'));
             $sql .= " AND p.brand IN ($placeholders)";
-            $types .= str_repeat('s', count($filters['brands'])); // s là kiểu string
+            $types .= str_repeat('s', count($filters['brands']));
             $params = array_merge($params, $filters['brands']);
         }
 
-        $sql .= " ORDER BY p.created_at DESC";
+        $sql .= " ORDER BY p.created_at DESC LIMIT ? OFFSET ?";
+        $types .= 'ii';
+        $params[] = $limit;
+        $params[] = $offset;
 
         $stmt = $conn->prepare($sql);
-
-        // Chỉ bind param nếu có tham số
         if ($types) {
             $stmt->bind_param($types, ...$params);
         }
-
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -248,7 +253,7 @@ class ProductModel
 
             $result->free();
             return (int)$total;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Lỗi lấy tổng số sản phẩm: " . $e->getMessage());
             return 0;
         } finally {
@@ -306,20 +311,86 @@ class ProductModel
         return $success;
     }
 
-    public function getRelatedProducts($category, $currentProductId, $limit = 4)
+
+    public function getRelatedProducts($categoryId, $currentProductId, $limit = 4)
     {
-        global $pdo;
+        $conn = db_connect(); // Sử dụng hàm kết nối MySQLi của dự án
 
-        // Tránh injection cho LIMIT -> ép kiểu integer
-        $limit = (int)$limit;
-        $sql = "SELECT id, name, category, price, discount, image, stock
+        $sql = "SELECT id, name, price, image_url as image, stock
                 FROM products
-                WHERE category = ? AND id != ?
+                WHERE category_id = ? AND id != ? AND status = 'active'
                 ORDER BY RAND()
-                LIMIT {$limit}";
+                LIMIT ?";
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$category, $currentProductId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare($sql);
+
+        // Ép kiểu $limit thành số nguyên để đảm bảo an toàn
+        $limit = (int)$limit;
+
+        // Gán các tham số vào câu lệnh SQL
+        $stmt->bind_param("iii", $categoryId, $currentProductId, $limit);
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $products = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt->close();
+        $conn->close();
+
+        return $products;
+    }
+
+    /**
+     * Đếm tổng số sản phẩm đang ở trạng thái 'active'.
+     * @return int
+     */
+    public function countAllActiveProducts()
+    {
+        $conn = db_connect();
+        $sql = "SELECT COUNT(id) as total FROM products WHERE status = 'active'";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+        return (int)($row['total'] ?? 0);
+    }
+
+    /**
+     * Đếm tổng số sản phẩm sau khi áp dụng bộ lọc.
+     * @param array $filters
+     * @return int
+     */
+    public function countFilteredProducts($filters)
+    {
+        $conn = db_connect();
+        $sql = "SELECT COUNT(p.id) as total FROM products p WHERE p.status = 'active'";
+
+        $params = [];
+        $types = '';
+
+        if (!empty($filters['categories'])) {
+            $placeholders = implode(',', array_fill(0, count($filters['categories']), '?'));
+            $sql .= " AND p.category_id IN ($placeholders)";
+            $types .= str_repeat('i', count($filters['categories']));
+            $params = array_merge($params, $filters['categories']);
+        }
+        if (!empty($filters['max_price'])) {
+            $sql .= " AND p.price <= ?";
+            $types .= 'd';
+            $params[] = $filters['max_price'];
+        }
+        if (!empty($filters['brands'])) {
+            $placeholders = implode(',', array_fill(0, count($filters['brands']), '?'));
+            $sql .= " AND p.brand IN ($placeholders)";
+            $types .= str_repeat('s', count($filters['brands']));
+            $params = array_merge($params, $filters['brands']);
+        }
+
+        $stmt = $conn->prepare($sql);
+        if ($types) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return (int)($row['total'] ?? 0);
     }
 }
