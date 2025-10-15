@@ -24,8 +24,14 @@ $logged_in_username = $_SESSION['username'] ?? 'Khách';
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $product = $productModel->findProductById($product_id);
 $product_found = !empty($product);
+$top_products = $orderModel->getTopSellingProducts(4) ?? [];
+
 
 $reviews = []; $review_count = 0; $average_rating = 0; $canReview = false; $productBlocks = [];
+
+function formatPrice($price) {
+    return number_format($price, 0, ',', '.') . ' VNĐ';
+}
 
 if ($product_found) {
     $reviews = $reviewModel->getReviewsByProductId($product_id);

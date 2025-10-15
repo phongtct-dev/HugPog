@@ -62,6 +62,9 @@
                                         <p class="fs-8 mb-0 ">Tạo tài khoản mới</p>
                                         <a class="text-primary fw-bold ms-3" href="register.php">Tạo tài khoản</a>
                                     </div>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <a class="text-primary fw-bold ms-3" href="<?php echo BASE_URL; ?>public/admin/login.php">Bạn là Quản trị viên?</a>
+                                    </div>
                                 </form>
                             </div>
                         </div>

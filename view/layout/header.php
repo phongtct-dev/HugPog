@@ -54,16 +54,6 @@
                 <div class="col-md-6">
                     <div class="header-search">
                         <form action="<?php echo BASE_URL; ?>public/search.php" method="GET">
-                            <select class="input-select" name="category_id">
-                                <option value="">Tất cả</option>
-                                <?php if (!empty($categories)): ?>
-                                    <?php foreach ($categories as $category): ?>
-                                        <option value="<?php echo htmlspecialchars($category['id']); ?>">
-                                            <?php echo htmlspecialchars($category['name']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
                             <input class="input" name="keyword" placeholder="Tìm kiếm tại đây" value="<?php echo htmlspecialchars($_GET['keyword'] ?? ''); ?>" />
                             <button class="search-btn" type="submit">Tìm kiếm</button>
                         </form>

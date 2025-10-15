@@ -12,7 +12,7 @@ ini_set('display_errors', 1);
 // === CẤU HÌNH DATABASE ===
 define('DB_SERVER', 'localhost');      // Tên server, thường là localhost
 define('DB_USERNAME', 'root');         // Username của MySQL, mặc định là root
-define('DB_PASSWORD', '');             // Mật khẩu của MySQL, mặc định là trống
+define('DB_PASSWORD', '17042nqH@');             // Mật khẩu của MySQL, mặc định là trống
 define('DB_NAME', 'webhugpog');        // Tên database của bạn
 
 // === CẤU HÌNH CHUNG ===

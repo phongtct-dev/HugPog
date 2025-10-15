@@ -15,49 +15,86 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-3">
-                <h3 class="my-4">Bộ lọc</h3>
-                <form action="<?php echo BASE_URL; ?>public/product_list.php" method="GET">
-                    <div class="card mb-3">
-                        <div class="card-header fw-bold">Danh mục</div>
-                        <div class="card-body" style="max-height: 200px; overflow-y: auto;">
-                            <?php foreach ($categories as $category): ?>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="categories[]" value="<?php echo $category['id']; ?>" id="cat_<?php echo $category['id']; ?>" <?php if (isset($filters) && in_array($category['id'], $filters['categories'])) echo 'checked'; ?>>
-                                    <label class="form-check-label" for="cat_<?php echo $category['id']; ?>">
-                                        <?php echo htmlspecialchars($category['name']); ?>
-                                    </label>
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body">
+                        <h4 class="fw-bold text-danger mb-4 border-bottom pb-2">
+                            <i class="bi bi-funnel me-2"></i>Bộ lọc
+                        </h4>
+
+                        <form action="<?php echo BASE_URL; ?>public/product_list.php" method="GET">
+
+                            <!-- Danh mục -->
+                            <div class="mb-4">
+                                <h6 class="fw-semibold text-secondary mb-2">
+                                    <i class="bi bi-list-ul me-1"></i>Danh mục
+                                </h6>
+                                <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
+                                    <?php foreach ($categories as $category): ?>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="categories[]"
+                                                value="<?php echo $category['id']; ?>"
+                                                id="cat_<?php echo $category['id']; ?>"
+                                                <?php if (isset($filters) && in_array($category['id'], $filters['categories'])) echo 'checked'; ?>>
+                                            <label class="form-check-label" for="cat_<?php echo $category['id']; ?>">
+                                                <?php echo htmlspecialchars($category['name']); ?>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+                            </div>
 
-                    <div class="card mb-3">
-                        <div class="card-header fw-bold">Giá</div>
-                        <div class="card-body">
-                            <label for="priceRange" class="form-label">Tối đa: <span id="priceValue" class="fw-bold"><?php echo number_format($filters['max_price'] ?? 20000000); ?></span> VNĐ</label>
-                            <input type="range" class="form-range" min="100000" max="20000000" step="100000" name="max_price" id="priceRange" value="<?php echo $filters['max_price'] ?? 20000000; ?>">
-                        </div>
-                    </div>
-
-                    <div class="card mb-3">
-                        <div class="card-header fw-bold">Thương hiệu</div>
-                        <div class="card-body" style="max-height: 200px; overflow-y: auto;">
-                            <?php foreach ($brands as $brand): ?>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="brands[]" value="<?php echo htmlspecialchars($brand['brand']); ?>" id="brand_<?php echo htmlspecialchars($brand['brand']); ?>" <?php if (isset($filters) && in_array($brand['brand'], $filters['brands'])) echo 'checked'; ?>>
-                                    <label class="form-check-label" for="brand_<?php echo htmlspecialchars($brand['brand']); ?>">
-                                        <?php echo htmlspecialchars($brand['brand']); ?>
+                            <!-- Giá -->
+                            <div class="mb-4">
+                                <h6 class="fw-semibold text-secondary mb-2">
+                                    <i class="bi bi-cash-coin me-1"></i>Khoảng giá
+                                </h6>
+                                <div class="border rounded p-3">
+                                    <label for="priceRange" class="form-label small">Tối đa:
+                                        <span id="priceValue" class="fw-bold text-danger">
+                                            <?php echo number_format($filters['max_price'] ?? 20000000); ?>
+                                        </span> VNĐ
                                     </label>
+                                    <input type="range" class="form-range"
+                                        min="100000" max="20000000" step="100000"
+                                        name="max_price" id="priceRange"
+                                        value="<?php echo $filters['max_price'] ?? 20000000; ?>">
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+                            </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-danger">Áp dụng bộ lọc</button>
+                            <!-- Thương hiệu -->
+                            <div class="mb-4">
+                                <h6 class="fw-semibold text-secondary mb-2">
+                                    <i class="bi bi-tags me-1"></i>Thương hiệu
+                                </h6>
+                                <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
+                                    <?php foreach ($brands as $brand): ?>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="brands[]"
+                                                value="<?php echo htmlspecialchars($brand['brand']); ?>"
+                                                id="brand_<?php echo htmlspecialchars($brand['brand']); ?>"
+                                                <?php if (isset($filters) && in_array($brand['brand'], $filters['brands'])) echo 'checked'; ?>>
+                                            <label class="form-check-label" for="brand_<?php echo htmlspecialchars($brand['brand']); ?>">
+                                                <?php echo htmlspecialchars($brand['brand']); ?>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <!-- Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-danger fw-semibold py-2 rounded-pill">
+                                    <i class="bi bi-filter-circle me-1"></i>Áp dụng bộ lọc
+                                </button>
+                            </div>
+
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
+
 
             <div class="col-lg-9">
                 <h1 class="my-4">Danh sách sản phẩm</h1>
@@ -106,29 +143,43 @@
 
                         <div class="col-12 mt-4">
                             <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-center">
-                                    <?php if ($totalPages > 1): ?>
+                                <?php if ($totalPages > 1): ?>
+                                    <ul class="pagination justify-content-center mb-0">
                                         <?php
-                                        // Tạo một query string từ các bộ lọc hiện tại
+                                        // Tạo query string từ các bộ lọc hiện tại
                                         $queryString = http_build_query(array_merge($filters, ['page' => '']));
                                         ?>
+
+                                        <!-- Nút Trước -->
                                         <li class="page-item <?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
-                                            <a class="page-link" href="?<?php echo http_build_query(array_merge($filters, ['page' => $currentPage - 1])); ?>">Trước</a>
+                                            <a class="page-link text-danger fw-semibold border-0"
+                                                href="?<?php echo http_build_query(array_merge($filters, ['page' => $currentPage - 1])); ?>">
+                                                <i class="bi bi-chevron-left"></i> Trước
+                                            </a>
                                         </li>
 
+                                        <!-- Số trang -->
                                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                             <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
-                                                <a class="page-link" href="?<?php echo http_build_query(array_merge($filters, ['page' => $i])); ?>"><?php echo $i; ?></a>
+                                                <a class="page-link fw-semibold <?php echo ($i == $currentPage) ? 'bg-danger border-0' : 'text-danger border-0'; ?>"
+                                                    href="?<?php echo http_build_query(array_merge($filters, ['page' => $i])); ?>">
+                                                    <?php echo $i; ?>
+                                                </a>
                                             </li>
                                         <?php endfor; ?>
 
+                                        <!-- Nút Sau -->
                                         <li class="page-item <?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
-                                            <a class="page-link" href="?<?php echo http_build_query(array_merge($filters, ['page' => $currentPage + 1])); ?>">Sau</a>
+                                            <a class="page-link text-danger fw-semibold border-0"
+                                                href="?<?php echo http_build_query(array_merge($filters, ['page' => $currentPage + 1])); ?>">
+                                                Sau <i class="bi bi-chevron-right"></i>
+                                            </a>
                                         </li>
-                                    <?php endif; ?>
-                                </ul>
+                                    </ul>
+                                <?php endif; ?>
                             </nav>
                         </div>
+
                     <?php else: ?>
                         <div class="col-md-12">
                             <p class="text-center">Không tìm thấy sản phẩm nào.</p>

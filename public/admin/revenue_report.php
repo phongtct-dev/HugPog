@@ -11,7 +11,7 @@ $dashboardController = new DashboardController();
 $data = $dashboardController->getDashboardData(); // Dùng chung hàm với dashboard
 
 // Gán dữ liệu vào các biến để view sử dụng
-$total_revenue = $data['total_revenue_month']; // Giả sử lấy tổng doanh thu tháng
+$total_revenue = $data['total_revenue']; 
 $total_orders = $data['total_orders'];
 $total_users = $data['total_users'];
 $total_products = $data['total_products'];

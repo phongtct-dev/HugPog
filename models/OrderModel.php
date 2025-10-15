@@ -337,6 +337,23 @@ class OrderModel
     }
 
     /**
+     * Lấy tổng doanh thu của toàn bộ đơn hàng (chỉ tính đơn 'Thành công').
+     * @return float
+     */
+    public function getTotalRevenueAll()
+    {
+        $conn = db_connect();
+        $sql = "SELECT SUM(total_amount) AS total 
+                FROM orders 
+                WHERE status = 'Thành công'";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+        $conn->close();
+
+        return $row ? (float)$row['total'] : 0;
+    }
+
+    /**
      * Lấy các đơn hàng gần đây (để hiển thị dashboard).
      */
     public function getRecentOrders($limit = 5)

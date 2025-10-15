@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     switch ($_POST['action']) {
         case 'create_staff': $staff_controller->handleCreateStaff(); break;
         case 'update_staff': $staff_controller->handleUpdateStaff(); break;
-        case 'delete_staff': $staff_controller->handleDeleteStaff(); break;
         case 'change_status': $staff_controller->handleUpdateStaffStatus(); break;
     }
 }

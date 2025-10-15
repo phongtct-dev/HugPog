@@ -166,23 +166,6 @@ class StaffModel
     }
 
     /**
-     * Xóa tài khoản nhân viên.
-     * @param int $staffId
-     * @return bool
-     */
-    public function DeleteStaff($staffId)
-    {
-        $conn = db_connect();
-        $sql = "DELETE FROM staff_accounts WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $staffId);
-        $success = $stmt->execute();
-        $stmt->close();
-        $conn->close();
-        return $success;
-    }
-
-    /**
      * Hàm tiện ích để bind_param hoạt động với mảng.
      * Đảm bảo mọi phần tử trong mảng là tham chiếu.
      * @param array $arr

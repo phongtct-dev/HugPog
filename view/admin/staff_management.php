@@ -90,12 +90,10 @@
                                                     </button>
                                                 </form>
 
-                                                <form method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa nhân viên này? Hành động này không thể hoàn tác!');">
+                                                <form method="POST" class="d-inline">
                                                     <input type="hidden" name="action" value="delete_staff">
                                                     <input type="hidden" name="staff_id" value="<?php echo $staff['id']; ?>">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
+                                                    
                                                 </form>
                                             </td>
                                         </tr>
