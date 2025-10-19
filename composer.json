@@ -1,0 +1,14 @@
+{
+    "name": "yourname/hugpog",
+    "description": "An e-commerce website for electronic accessories.",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\Controllers\\": "includes/controllers/",
+            "App\\Models\\": "models/"
+        }
+    },
+    "require": {
+        "phpmailer/phpmailer": "^6.11"
+    }
+}

@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# --- Giữ bảo mật cơ bản ---
+<Files ".htaccess">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Chuyển tất cả request không phải file thật về index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L]
+
+# 4. Chỉ định trang lỗi 404 tùy chỉnh
+ErrorDocument 404 /HugPog/view/error/404.php
+
+# --- Nén gzip (tùy chọn, không bắt buộc) ---
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/html text/css text/javascript
+</IfModule>
