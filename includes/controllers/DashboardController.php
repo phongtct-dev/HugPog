@@ -30,6 +30,7 @@ class DashboardController
     public function getDashboardData()
     {
         // Gọi các hàm từ Model để lấy dữ liệu
+        $total_revenue = $this->orderModel->getTotalRevenueAll();
         $total_orders = $this->orderModel->getTotalOrders();
         $total_products = $this->productModel->getTotalProducts();
         $total_users = $this->userModel->getTotalUsers();
@@ -46,6 +47,7 @@ class DashboardController
 
         // Trả về tất cả dữ liệu dưới dạng một mảng duy nhất
         return [
+            'total_revenue' => $total_revenue,
             'total_orders' => $total_orders,
             'total_products' => $total_products,
             'total_users' => $total_users,
@@ -56,6 +58,7 @@ class DashboardController
             'recent_products' => $recent_products,
             'revenue_chart_data' => $revenue_chart_data,
             'top_products' => $top_products,
+
         ];
     }
 }

@@ -42,11 +42,11 @@
                         <p><?php echo htmlspecialchars(substr($product['description'] ?? 'Đang cập nhật...', 0, 300)) . '...'; ?></p>
 
                         <form class="add-to-cart" action="<?php echo BASE_URL; ?>public/add_to_cart.php" method="POST" style="display: inline;">
-                            <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
-                            
+                            <div style="display: flex; gap:10px">
+                                <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
                                 <input type="number" class="form-control" name="quantity" value="1" min="1" max="<?php echo $product['stock'] ?? 99; ?>" style="width: 60px;">
                                 <button class="add-to-cart-btn btn btn-danger" type="submit"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ</button>
-                            
+                            </div>
                         </form>
                         <ul class="product-links mt-3">
                             <li>Danh mục:
@@ -123,6 +123,57 @@
                 </div>
             </div>
         <?php endif; ?>
+    </div>
+
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-title">
+                        <h3 class="title">Sản phẩm bán chạy</h3>
+                    </div>
+                </div>
+                <?php if (!empty($top_products)): ?>
+                    <?php foreach ($top_products as $tp): ?>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="product">
+                                <a href="<?php echo BASE_URL; ?>public/product.php?id=<?php echo $tp['id'] ?? 0; ?>" class="product-link">
+                                    <div class="product-img">
+                                        <img src="<?php echo htmlspecialchars($tp['image_url'] ?? '../public/asset/image/no-image.png'); ?>" alt="<?php echo htmlspecialchars($tp['product_name'] ?? 'Sản phẩm'); ?>" class="img-fluid" style="max-height: 250px; object-fit: cover; width: 100%;">
+                                        <?php if (!empty($tp['discount_percent']) && $tp['discount_percent'] > 0): ?>
+                                            <div class="product-label">
+                                                <span class="sale">-<?php echo $tp['discount_percent']; ?>%</span>
+                                                <span class="new">SALE</span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="product-body">
+                                        <p class="product-category"><?php echo htmlspecialchars($tp['category_name'] ?? 'Chưa phân loại'); ?></p>
+                                        <h3 class="product-name"><?php echo htmlspecialchars($tp['product_name'] ?? $tp['name'] ?? 'Không rõ tên'); ?></h3>
+                                        <h4 class="product-price">
+                                            <?php echo formatPrice($tp['discounted_price'] ?? $tp['price'] ?? 0); ?>
+                                            <?php if (!empty($tp['discount_percent']) && $tp['discount_percent'] > 0): ?>
+                                                <del class="product-old-price"><?php echo formatPrice($tp['price']); ?></del>
+                                            <?php endif; ?>
+                                        </h4>
+                                    </div>
+                                </a>
+                                <form class="add-to-cart" action="<?php echo BASE_URL; ?>public/add_to_cart.php" method="POST">
+                                    <input type="hidden" name="product_id" value="<?php echo $tp['id'] ?? 0; ?>">
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-md-12">
+                        <p class="text-center">Không tìm thấy sản phẩm bán chạy nào.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 
     <?php include __DIR__ . '/../layout/footer.php'; ?>

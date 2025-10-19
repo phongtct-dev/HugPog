@@ -29,7 +29,8 @@ class OrderModel
      * @param array|null $voucher Thông tin voucher từ session
      * @return int|false
      */
-    public function createOrder($userId, $customerName, $shippingAddress, $phone, $cartItems, $totalAmount, $voucher)
+    // --- THAY THẾ TOÀN BỘ HÀM NÀY ---
+    public function createOrder($userId, $customerName, $shippingAddress, $phone, $cartItems, $totalAmount, $voucher, $voucherDiscountAmount)
     {
         $conn = db_connect();
         $conn->begin_transaction();
@@ -37,29 +38,43 @@ class OrderModel
         try {
             $voucherId = $voucher['id'] ?? null;
             $voucherCode = $voucher['code'] ?? null;
-            $discountAmount = $voucher['discount_value'] ?? 0.00;
+
+            // SỬA Ở ĐÂY: Sử dụng $voucherDiscountAmount đã được tính toán sẵn từ Controller
+            $discountAmount = $voucherDiscountAmount ?? 0.00;
 
             // 1. Chèn vào bảng `orders`
             $sqlOrder = "INSERT INTO orders (user_id, customer_name, shipping_address, phone, total_amount, voucher_id, voucher_code, discount_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $stmtOrder = $conn->prepare($sqlOrder);
+            // Bây giờ, cả $totalAmount (tổng cuối) và $discountAmount (tiền giảm) đều đúng
             $stmtOrder->bind_param("isssdisd", $userId, $customerName, $shippingAddress, $phone, $totalAmount, $voucherId, $voucherCode, $discountAmount);
             $stmtOrder->execute();
             $orderId = $conn->insert_id;
             $stmtOrder->close();
 
-            // 2. Chèn vào bảng `order_items` VỚI GIÁ ĐÚNG
+            // 2. Chèn vào bảng order_items VÀ TRỪ TỒN KHO
             $sqlItem = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
             $stmtItem = $conn->prepare($sqlItem);
+
+            // THÊM: Câu lệnh cập nhật tồn kho
+            $sqlUpdateStock = "UPDATE products SET stock = stock - ? WHERE id = ?";
+            $stmtUpdateStock = $conn->prepare($sqlUpdateStock);
+
             foreach ($cartItems as $item) {
-                // Ưu tiên lấy giá đã giảm, nếu không có thì lấy giá gốc
                 $price_at_purchase = $item['discounted_price'] ?? $item['price'];
 
+                // Chèn Order Item
                 $stmtItem->bind_param("iiid", $orderId, $item['id'], $item['quantity'], $price_at_purchase);
                 $stmtItem->execute();
+
+                // THAO TÁC MỚI: Trừ Tồn Kho
+                $stmtUpdateStock->bind_param("ii", $item['quantity'], $item['id']);
+                $stmtUpdateStock->execute();
             }
             $stmtItem->close();
+            $stmtUpdateStock->close(); // <--- Đóng Statement mới
 
-            // 3. Cập nhật số lượng voucher (nếu có)
+
+            // 3. Giảm số lượng Voucher
             if ($voucherId) {
                 $sqlUpdateVoucher = "UPDATE vouchers SET quantity = quantity - 1 WHERE id = ?";
                 $stmtUpdateVoucher = $conn->prepare($sqlUpdateVoucher);
@@ -68,7 +83,8 @@ class OrderModel
                 $stmtUpdateVoucher->close();
             }
 
-            // 4. Xóa giỏ hàng
+
+            // 4. Xóa Giỏ hàng (Giữ nguyên)
             $sqlDeleteCart = "DELETE FROM carts WHERE user_id = ?";
             $stmtDeleteCart = $conn->prepare($sqlDeleteCart);
             $stmtDeleteCart->bind_param("i", $userId);
@@ -163,7 +179,7 @@ class OrderModel
      */
     public function listOrdersForAdmin()
     {
-       
+
         return $this->getAllOrders();
     }
 
@@ -175,7 +191,7 @@ class OrderModel
     {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $orderId = intval($_GET['id']);
-            
+
             return $this->getOrderDetailsById($orderId);
         }
         return null;
@@ -190,7 +206,7 @@ class OrderModel
             $orderId = intval($_POST['order_id']);
             $newStatus = $_POST['status'];
 
-            
+
             return $this->updateOrderStatus($orderId, $newStatus);
         }
         // Chuyển hướng về lại trang chi tiết đơn hàng
@@ -334,6 +350,23 @@ class OrderModel
         $row = $result->fetch_assoc();
         $conn->close();
         return $row ? $row['total'] : 0;
+    }
+
+    /**
+     * Lấy tổng doanh thu của toàn bộ đơn hàng (chỉ tính đơn 'Thành công').
+     * @return float
+     */
+    public function getTotalRevenueAll()
+    {
+        $conn = db_connect();
+        $sql = "SELECT SUM(total_amount) AS total 
+                FROM orders 
+                WHERE status = 'Thành công'";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+        $conn->close();
+
+        return $row ? (float)$row['total'] : 0;
     }
 
     /**

@@ -149,10 +149,18 @@ class ProductController
 
     // Lấy các bộ lọc từ URL
     $filters = [
-        'categories' => $_GET['categories'] ?? [],
+        // Đảm bảo categories và brands luôn là mảng, kể cả khi rỗng
+        // array_filter(array_values(...)) giúp loại bỏ các giá trị null/rỗng 
+        // và đảm bảo nó luôn là một mảng được đánh chỉ mục lại (indexed array).
+        'categories' => array_filter(isset($_GET['categories']) ? (array)$_GET['categories'] : []),
         'max_price'  => $_GET['max_price'] ?? null,
-        'brands'     => $_GET['brands'] ?? [],
+        'brands'     => array_filter(isset($_GET['brands']) ? (array)$_GET['brands'] : []),
     ];
+
+    // Nếu max_price bị gửi là chuỗi rỗng (''), ta đặt lại là null hoặc giá trị max
+    if (empty($filters['max_price']) && isset($_GET['max_price'])) {
+        $filters['max_price'] = null; // hoặc đặt thành 20000000 nếu cần
+    }
 
     // Đếm tổng sản phẩm DỰA TRÊN BỘ LỌC
     $totalProducts = $this->productModel->countFilteredProducts($filters);
@@ -165,7 +173,7 @@ class ProductController
         'products' => $products,
         'currentPage' => $currentPage,
         'totalPages' => $totalPages,
-        'filters' => $filters // Trả về filters để view giữ trạng thái
+        'filters' => $filters 
     ];
     
     }

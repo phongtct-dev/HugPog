@@ -13,7 +13,7 @@
                 <li><a href="https://www.google.com/maps/place/613+%C4%90.+%C3%82u+C%C6%A1,+Ph%C3%BA+Trung,+T%C3%A2n+Ph%C3%BA,+H%E1%BB%93+Ch%C3%AD+Minh+700000,+Vi%E1%BB%87t+Nam/@10.7843347,106.6390851,17z/data=!3m1!4b1!4m6!3m5!1s0x31752eb1cd7d4e49:0x411ab56b2abeaf38!8m2!3d10.7843294!4d106.64166!16s%2Fg%2F11lnh_1llp?entry=ttu&g_ep=EgoyMDI1MDkzMC4wIKXMDSoASAFQAw%3D%3D"><i class="fa-solid fa-location-dot"></i> 613 Âu Cơ</a></li>
             </ul>
             <ul class="header-links pull-right">
-                <li><a href="#"><i class="fa-solid fa-dollar-sign"></i> VND</a></li>
+                <li><a href="#"><i class="fa-solid fa-dong-sign"></i>VNĐ</a></li>
                 <?php if ($is_logged_in): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
@@ -54,16 +54,6 @@
                 <div class="col-md-6">
                     <div class="header-search">
                         <form action="<?php echo BASE_URL; ?>public/search.php" method="GET">
-                            <select class="input-select" name="category_id">
-                                <option value="">Tất cả</option>
-                                <?php if (!empty($categories)): ?>
-                                    <?php foreach ($categories as $category): ?>
-                                        <option value="<?php echo htmlspecialchars($category['id']); ?>">
-                                            <?php echo htmlspecialchars($category['name']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
                             <input class="input" name="keyword" placeholder="Tìm kiếm tại đây" value="<?php echo htmlspecialchars($_GET['keyword'] ?? ''); ?>" />
                             <button class="search-btn" type="submit">Tìm kiếm</button>
                         </form>

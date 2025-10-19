@@ -62,7 +62,8 @@
                 <div class="card text-center">
                     <div class="card-body">
                         <h5 class="card-title"><?php echo htmlspecialchars($currentUser['full_name']); ?></h5>
-                        <p class="text-muted">Cấp bậc: <?php echo ucfirst($currentUser['rank'] ?? 'Bạc'); ?></p>
+                        <p class="text-muted">Cấp bậc: <?php echo displayRankBadge($currentUser['rank'] ?? 'silver'); ?></p>
+                        
                         <a href="<?php echo BASE_URL; ?>public/order_history.php" class="btn btn-outline-primary mt-2">Lịch sử mua hàng</a>
                     </div>
                 </div>

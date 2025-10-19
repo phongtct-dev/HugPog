@@ -125,19 +125,43 @@ class PromotionController
         exit();
     }
 
-    private function getPromotionStatusBadge($startDate, $endDate)
-    {
-        $now = time();
-        $start = strtotime($startDate);
-        $end = strtotime($endDate . ' 23:59:59');
-        if ($start > $now) {
+private function getPromotionStatusBadge($startDate, $endDate)
+{
+    // Cần phải xử lý để đảm bảo $startDate và $endDate chỉ là ngày tháng năm (YYYY-MM-DD)
+    // Hoặc, nếu chúng đã là DATETIME, KHÔNG được nối chuỗi thêm nữa.
+    
+    try {
+        $timezone = new \DateTimeZone('Asia/Ho_Chi_Minh');
+        
+        $now_dt = new \DateTime('now', $timezone);
+        $now_timestamp = $now_dt->getTimestamp();
+
+        // 1. Tính toán thời gian BẮT ĐẦU:
+        // Cú pháp sửa: Chỉ truyền $startDate mà không nối chuỗi ' 00:00:00' nếu nó đã là DATETIME
+        // Nếu muốn đảm bảo là 00:00:00, bạn có thể tạo từ ngày (date)
+        $start_dt = new \DateTime((new \DateTime($startDate))->format('Y-m-d') . ' 00:00:00', $timezone);
+        $start_timestamp = $start_dt->getTimestamp();
+        
+        // 2. Tính toán thời gian KẾT THÚC (cuối ngày: 23:59:59)
+        // Cú pháp sửa: Đảm bảo chỉ có một phần thời gian
+        $end_dt = new \DateTime((new \DateTime($endDate))->format('Y-m-d') . ' 23:59:59', $timezone); 
+        $end_timestamp = $end_dt->getTimestamp();
+
+        if ($start_timestamp > $now_timestamp) {
             return '<span class="badge bg-info text-dark">Sắp diễn ra</span>';
         }
-        if ($end < $now) {
+        
+        if ($end_timestamp < $now_timestamp) {
             return '<span class="badge bg-secondary">Đã kết thúc</span>';
         }
+        
         return '<span class="badge bg-success">Đang diễn ra</span>';
+    } catch (\Exception $e) {
+        // Ghi log lỗi để debug
+        error_log("DateTime Parsing Error in PromotionController: " . $e->getMessage());
+        return '<span class="badge bg-danger">Lỗi Hệ Thống</span>';
     }
+}
 
     public function getPromotionsViewData()
     {

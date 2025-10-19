@@ -1,3 +1,10 @@
+<?php
+// Định nghĩa BASE_URL nếu chưa có
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/HugPog/');
+}
+?>
+
 <!doctype html>
 <html lang="vi">
 <head>

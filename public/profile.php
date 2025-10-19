@@ -13,6 +13,22 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+/**
+ * Chuyển đổi rank (silver, gold, diamond) sang tiếng Việt và trả về HTML badge.
+ * @param string $rank Rank tiếng Anh
+ * @return string HTML cho badge
+ */
+function displayRankBadge($rank) {
+    $rank = strtolower($rank);
+    $text = ucfirst($rank); $class = 'bg-secondary';
+    switch ($rank) {
+        case 'diamond': $class = 'bg-primary'; $text = 'Kim cương'; break;
+        case 'gold': $class = 'bg-warning text-dark'; $text = 'Vàng'; break;
+        case 'silver': $class = 'bg-info'; $text = 'Bạc'; break;
+    }
+    return '<span class="badge ' . $class . '">' . $text . '</span>';
+}
+
 $userController = new UserController();
 $cartController = new CartController();
 $categoryController = new CategoryController();

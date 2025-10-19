@@ -21,6 +21,9 @@ function db_connect() {
     // Thiết lập bảng mã UTF-8 để hiển thị tiếng Việt chính xác
     $conn->set_charset("utf8mb4");
 
+    // === THÊM DÒNG NÀY VÀO ĐỂ ĐỒNG BỘ MÚI GIỜ ===
+    $conn->query("SET time_zone = '+07:00'");
+
     // Trả về kết nối
     return $conn;
 }

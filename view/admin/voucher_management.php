@@ -109,6 +109,15 @@
                     </div>
                 </div>
             </div>
+            <div class="py-6 px-6 text-center">
+                <span class="copyright">
+                    Bản quyền &copy;
+                    <script>
+                        document.write(new Date().getFullYear());
+                    </script>
+                    Tất cả quyền được bảo lưu | Mẫu này được tạo bởi Hùng & Phong
+                </span>
+            </div>
         </div>
     </div>
 
@@ -127,8 +136,9 @@
                             <input type="text" class="form-control" id="voucherCode" name="voucherCode" required maxlength="50" oninput="this.value = this.value.toUpperCase()">
                         </div>
                         <div class="mb-3">
-                            <label for="voucherValue" class="form-label">Giá trị giảm giá (VND hoặc %)</label>
-                            <input type="number" step="0.01" class="form-control" id="voucherValue" name="discountValue" required min="1">
+                            <label for="voucherValue" class="form-label">Giá trị giảm giá (%)</label>
+                            <input type="number" step="0.01" class="form-control" id="voucherValue" name="discountValue" required min="1" max="100">
+                            <div class="form-text text-muted">Giá trị phải nằm trong khoảng 1 đến 100 (tính theo %).</div>
                         </div>
                         <div class="mb-3">
                             <label for="voucherQuantity" class="form-label">Số lượng</label>
@@ -171,8 +181,9 @@
                             <input type="text" class="form-control" id="editVoucherCode" name="voucherCode" required maxlength="50" oninput="this.value = this.value.toUpperCase()">
                         </div>
                         <div class="mb-3">
-                            <label for="editVoucherValue" class="form-label">Giá trị giảm giá (VND hoặc %)</label>
-                            <input type="number" step="0.01" class="form-control" id="editVoucherValue" name="discountValue" required min="1">
+                            <label for="editVoucherValue" class="form-label">Giá trị giảm giá (%)</label>
+                            <input type="number" step="0.01" class="form-control" id="editVoucherValue" name="discountValue" required min="1" max="100">
+                            <div class="form-text text-muted">Giá trị phải nằm trong khoảng 1 đến 100 (tính theo %).</div>
                         </div>
                         <div class="mb-3">
                             <label for="editVoucherQuantity" class="form-label">Số lượng</label>

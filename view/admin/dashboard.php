@@ -28,7 +28,7 @@ function format_currency_vn($amount)
 <body>
 
     <div id="app">
-    <?php include __DIR__ . '../../layout/sidebar.php'; ?>
+        <?php include __DIR__ . '../../layout/sidebar.php'; ?>
 
 
         <div id="main" class="p-4">
@@ -227,6 +227,15 @@ function format_currency_vn($amount)
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="py-6 px-6 text-center">
+                    <span class="copyright">
+                        Bản quyền &copy;
+                        <script>
+                            document.write(new Date().getFullYear());
+                        </script>
+                        Tất cả quyền được bảo lưu | Mẫu này được tạo bởi Hùng & Phong
+                    </span>
                 </div>
             </section>
         </div>

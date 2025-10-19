@@ -36,77 +36,62 @@ class OrderController
      * Xử lý việc tạo đơn hàng.
      */
     public function handlePlaceOrder()
-    {
+{
+    if (session_status() == PHP_SESSION_NONE) session_start();
 
-
-        if (!isset($_SESSION['user_id']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . 'public/login.php');
-            exit();
-        }
-
-        $userId = $_SESSION['user_id'];
-        $cartModel = new CartModel();
-        $cartItems = $cartModel->getCartItemsByUserId($userId);
-
-        if (empty($cartItems)) {
-            header('Location: ' . VIEW_URL . 'user/cart.php');
-            exit();
-        }
-
-        $customerName = trim($_POST['full_name']);
-        $shippingAddress = trim($_POST['address']);
-        $phone = trim($_POST['phone']);
-
-        // ✅ TÍNH TỔNG PHỤ
-        $subtotal = 0;
-        foreach ($cartItems as $item) {
-            $price_to_use = $item['discounted_price'] ?? $item['price'];
-            $subtotal += $price_to_use * $item['quantity'];
-        }
-
-        // ✅ ÁP MÃ GIẢM GIÁ
-        $voucher = $_SESSION['voucher'] ?? null;
-        $voucherDiscount = 0;
-
-        if ($voucher) {
-            $discountValue = floatval($voucher['discount_value'] ?? 0);
-            $discountType  = $voucher['type'] ?? $voucher['discount_type'] ?? 'amount';
-
-            if ($discountType === 'percent') {
-                $voucherDiscount = ($discountValue / 100) * $subtotal;
-            } else {
-                $voucherDiscount = $discountValue;
-            }
-
-            if ($voucherDiscount > $subtotal) {
-                $voucherDiscount = $subtotal;
-            }
-        }
-
-        // ✅ TỔNG THANH TOÁN CUỐI
-        $totalAmount = $subtotal - $voucherDiscount;
-        if ($totalAmount < 0) $totalAmount = 0;
-
-        // ✅ LƯU ĐƠN HÀNG
-        $orderModel = new OrderModel();
-        $orderId = $orderModel->createOrder($userId, $customerName, $shippingAddress, $phone, $cartItems, $totalAmount, $voucher);
-
-        if ($orderId) {
-            // Xóa voucher khỏi session sau khi đã dùng
-            unset($_SESSION['voucher']);
-
-            // GỌI HÀM GỬI EMAIL HÓA ĐƠN
-            $this->sendOrderConfirmationEmail($orderId);
-
-            // Chuyển hướng đến trang báo thành công
-            header('Location: ' . BASE_URL . 'public/order_success.php?order_id=' . $orderId);
-            exit();
-        } else {
-            $_SESSION['error_message'] = "Đặt hàng thất bại. Vui lòng thử lại.";
-            header('Location: ' . BASE_URL . 'public/checkout.php');
-            exit();
-        }
+    if (!isset($_SESSION['user_id']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ' . BASE_URL . 'public/login.php');
+        exit();
     }
+
+    $userId = $_SESSION['user_id'];
+
+    // --- BẮT ĐẦU PHẦN SỬA LỖI LOGIC ---
+
+    // 1. Khởi tạo CartController để sử dụng lại logic tính toán
+    $cartController = new CartController();
+
+    // 2. Lấy thông tin giỏ hàng (giống hệt trang checkout)
+    $cartData = $cartController->getCartItems();
+    $cartItems = $cartData['items'];
+    $subtotal = $cartData['subtotal'];
+
+    if (empty($cartItems)) {
+        header('Location: ' . BASE_URL . 'public/cart.php');
+        exit();
+    }
+
+    // 3. Tính toán lại tổng tiền cuối cùng một cách CHÍNH XÁC (giống hệt trang checkout)
+    $totalsData = $cartController->calculateCartTotals($subtotal);
+    $voucherDiscount = $totalsData['voucherDiscount']; // Số tiền giảm giá đúng (VD: 110.000)
+    $totalAmount = $totalsData['totalAmount'];       // Tổng tiền cuối cùng đúng (VD: 440.000)
+
+    // --- KẾT THÚC PHẦN SỬA LỖI LOGIC ---
+
+    // Lấy thông tin khách hàng từ form
+    $customerName = trim($_POST['full_name']);
+    $shippingAddress = trim($_POST['address']);
+    $phone = trim($_POST['phone']);
+    $voucher = $_SESSION['voucher'] ?? null;
+
+    // 4. Gọi Model để lưu đơn hàng với các con số ĐÃ ĐÚNG
+    $orderModel = new OrderModel();
+    $orderId = $orderModel->createOrder($userId, $customerName, $shippingAddress, $phone, $cartItems, $totalAmount, $voucher, $voucherDiscount);
+
+    if ($orderId) {
+        unset($_SESSION['voucher']);
+
+        // Gọi hàm gửi email hóa đơn
+        $this->sendOrderConfirmationEmail($orderId);
+
+        header('Location: ' . BASE_URL . 'public/order_success.php?order_id=' . $orderId);
+        exit();
+    } else {
+        $_SESSION['error_message'] = "Đặt hàng thất bại. Vui lòng thử lại.";
+        header('Location: ' . BASE_URL . 'public/checkout.php');
+        exit();
+    }
+}
 
 
     //

@@ -213,43 +213,4 @@ class StaffController
         exit();
     }
 
-    /**
-     * Xử lý xóa nhân viên.
-     * CÓ KIỂM TRA: KHÔNG ĐƯỢC CHẠM VÀO TÀI KHOẢN ADMIN.
-     */
-    public function handleDeleteStaff()
-    {
-        if (session_status() == PHP_SESSION_NONE) session_start();
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['staff_id'])) {
-            return;
-        }
-
-        $staffId = intval($_POST['staff_id']);
-
-        $staffModel = new StaffModel();
-        $currentStaff = $staffModel->getStaffById($staffId);
-
-        // **QUY TẮC BẢO MẬT: KHÔNG ĐƯỢC CHẠM VÀO TÀI KHOẢN ADMIN/QUẢN TRỊ VIÊN GỐC**
-        if ($currentStaff && ($currentStaff['role'] === 'Quản trị viên' || $currentStaff['role'] === 'admin')) {
-            $_SESSION['error_message'] = "❌ Lỗi: Không thể xóa tài khoản Quản trị viên gốc.";
-            header('Location: ' . BASE_URL . 'public/admin/staff.php');
-            exit();
-        }
-
-        // Không cho nhân viên tự xóa chính mình
-        if (isset($_SESSION['staff_id']) && $_SESSION['staff_id'] == $staffId) {
-            $_SESSION['error_message'] = "❌ Lỗi: Không thể tự xóa tài khoản của mình.";
-            header('Location: ' . BASE_URL . 'public/admin/staff.php');
-            exit();
-        }
-
-        if ($staffModel->deleteStaff($staffId)) {
-            $_SESSION['success_message'] = "✅ Xóa nhân viên thành công!";
-        } else {
-            $_SESSION['error_message'] = "❌ Lỗi: Xóa nhân viên thất bại.";
-        }
-
-        header('Location: ' . BASE_URL . 'public/admin/staff.php');
-        exit();
-    }
 }

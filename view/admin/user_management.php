@@ -111,6 +111,15 @@
                     </div>
                 </div>
             </div>
+            <div class="py-6 px-6 text-center">
+                <span class="copyright">
+                    Bản quyền &copy;
+                    <script>
+                        document.write(new Date().getFullYear());
+                    </script>
+                    Tất cả quyền được bảo lưu | Mẫu này được tạo bởi Hùng & Phong
+                </span>
+            </div>
         </div>
     </div>
 

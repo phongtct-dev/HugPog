@@ -28,7 +28,7 @@ class VoucherController
      */
     public function handleAdminVoucherAction()
     {
-        
+
 
         // Mặc định Staff ID nếu chưa đăng nhập. Thay '1' bằng logic session thực tế
         $staff_id = $_SESSION['staff_id'] ?? 1;
@@ -86,9 +86,9 @@ class VoucherController
                 ];
 
                 // 2. Validation
-                $error = '';
-                if (empty($data['code']) || $data['discount_value'] <= 0 || $data['quantity'] < 0) {
-                    $error = 'Vui lòng điền đầy đủ Mã, Giá trị giảm giá, và Số lượng hợp lệ.';
+                // SỬA ĐIỀU KIỆN VALIDATION ĐỂ CHỈ CHẤP NHẬN GIÁ TRỊ TỪ 1 ĐẾN 100
+                if (empty($data['code']) || $data['discount_value'] <= 0 || $data['discount_value'] > 100 || $data['quantity'] < 0) {
+                    $error = 'Vui lòng điền đầy đủ Mã, Số lượng hợp lệ, và Giá trị giảm giá phải nằm trong khoảng 1 đến 100 (tính theo %).';
                 } else if (empty($data['expiry_date']) || $data['expiry_date'] === 'INVALID') {
                     $error = 'Định dạng Ngày và Giờ hết hạn không hợp lệ. Vui lòng đảm bảo đã chọn đủ Ngày và Giờ.';
                 }
@@ -125,5 +125,4 @@ class VoucherController
         header("Location: " . $redirect_url);
         exit();
     }
-
 }

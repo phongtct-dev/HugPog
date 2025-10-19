@@ -119,7 +119,7 @@ class CartController
                 }
             }
         }
-         $redirectUrl = $_SERVER['HTTP_REFERER'] ?? (BASE_URL . 'public/product_list.php');
+        $redirectUrl = $_SERVER['HTTP_REFERER'] ?? (BASE_URL . 'public/product_list.php');
         header('Location: ' . $redirectUrl);
         exit();
     }
@@ -129,7 +129,7 @@ class CartController
         if (isset($_SESSION['voucher'])) {
             unset($_SESSION['voucher']);
         }
-         $redirectUrl = $_SERVER['HTTP_REFERER'] ?? (BASE_URL . 'public/product_list.php');
+        $redirectUrl = $_SERVER['HTTP_REFERER'] ?? (BASE_URL . 'public/product_list.php');
         header('Location: ' . $redirectUrl);
         exit();
     }
@@ -147,7 +147,7 @@ class CartController
 
     public function getCartItems()
     {
-        
+
         $finalItems = [];
         $subtotal = 0;
 
@@ -189,44 +189,35 @@ class CartController
         if (session_status() == PHP_SESSION_NONE) session_start();
 
         $voucherDiscount = 0;
-        // Lấy mã voucher đã áp dụng từ session
         $voucherCode = $_SESSION['voucher']['code'] ?? null;
 
         if ($voucherCode) {
-            // Lấy thông tin chi tiết voucher từ Model
-            // Lưu ý: Để voucher hoạt động, hàm getVoucherByCode() phải trả về voucher HỢP LỆ (còn hạn, còn số lượng, active).
-            $voucher = $this->voucherModel->getVoucherByCode($voucherCode);
+            $voucher = $this->voucherModel->findVoucherByCode($voucherCode);
 
-            // **LOGIC ÁP DỤNG VOUCHER ĐÃ SỬA**
             if ($voucher) {
-                $discountValue = $voucher['discount_value'];
+                $discountValue = (float)$voucher['discount_value'];
 
-                // 1. Áp dụng quy tắc suy đoán loại giảm giá:
-                //    - Nếu giá trị <= 100 (và > 0): Giảm theo Phần trăm.
-                //    - Nếu giá trị > 100: Giảm Tiền cố định (VNĐ).
+                // === LOGIC MỚI: CHỈ XỬ LÝ NẾU GIÁ TRỊ GIẢM GIÁ HỢP LỆ (0 < value <= 100) ===
+                if ($discountValue > 0 && $discountValue <= 100) {
 
-                if ($discountValue <= 100 && $discountValue > 0) {
-                    // Loại Giảm theo Phần trăm (Percent)
+                    // 1. Ép buộc tính theo PHẦN TRĂM
                     $discountPercent = $discountValue / 100;
                     $voucherDiscount = $subtotal * $discountPercent;
 
-                    // Do không có cột max_discount_amount, không thể áp dụng giới hạn giảm tối đa.
-
-                } elseif ($discountValue > 100) {
-                    // Loại Giảm Tiền cố định (Fixed Amount)
-                    $voucherDiscount = $discountValue;
+                    // 2. Đảm bảo số tiền giảm không vượt quá tổng tiền hàng
+                    $voucherDiscount = min($voucherDiscount, $subtotal);
+                } else {
+                    // Nếu giá trị ngoài phạm vi 1-100, coi như không hợp lệ và hủy áp dụng
+                    unset($_SESSION['voucher']);
+                    $_SESSION['voucher_error'] = "Mã voucher không hợp lệ (giá trị phải là 1% - 100%).";
                 }
-
-                // 2. Đảm bảo số tiền giảm không vượt quá tổng tiền hàng (để tổng tiền không âm)
-                $voucherDiscount = min($voucherDiscount, $subtotal);
             } else {
                 // Voucher không tồn tại hoặc không hợp lệ, xóa khỏi session
                 unset($_SESSION['voucher']);
             }
         }
 
-        // Tính tổng tiền cuối cùng: Tổng phụ - Giảm giá Voucher + Phí vận chuyển
-        $totalAmount = max(0, $subtotal - $voucherDiscount); // max(0, ...) để tránh tổng tiền bị âm
+        $totalAmount = max(0, $subtotal - $voucherDiscount);
 
         return [
             'voucherDiscount' => $voucherDiscount,
@@ -279,8 +270,8 @@ class CartController
 
         // Bước 4: Chuyển hướng người dùng về trang họ vừa thao tác
         // Nếu không có HTTP_REFERER, chuyển về trang chủ
-            $redirectUrl = $_SERVER['HTTP_REFERER'] ?? (BASE_URL . 'public/product_list.php');
-            header('Location: ' . $redirectUrl);
+        $redirectUrl = $_SERVER['HTTP_REFERER'] ?? (BASE_URL . 'public/product_list.php');
+        header('Location: ' . $redirectUrl);
         exit();
     }
 }

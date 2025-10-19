@@ -10,10 +10,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // === CẤU HÌNH DATABASE ===
-define('DB_SERVER', 'localhost');      // Tên server, thường là localhost
-define('DB_USERNAME', 'root');         // Username của MySQL, mặc định là root
-define('DB_PASSWORD', '');             // Mật khẩu của MySQL, mặc định là trống
-define('DB_NAME', 'webhugpog');        // Tên database của bạn
+define('DB_SERVER', 'sql201.infinityfree.com');      // Tên server, thường là localhost
+define('DB_USERNAME', 'if0_40173225');         // Username của MySQL, mặc định là root
+define('DB_PASSWORD', 'HugPog123');             // Mật khẩu của MySQL, mặc định là trống
+define('DB_NAME', 'if0_40173225_webhugpog');        // Tên database của bạn
+
 
 // === CẤU HÌNH CHUNG ===
 // URL gốc của website. Rất quan trọng!
